@@ -55,7 +55,7 @@ browser-harness auth login
 Or import a key safely:
 
 ```bash
-browser-harness auth login --api-key-stdin
+printf '%s' "$BROWSER_USE_API_KEY" | browser-harness auth login --api-key-stdin
 ```
 
 Pick a short made-up name; `r7k2` below is just a placeholder:
