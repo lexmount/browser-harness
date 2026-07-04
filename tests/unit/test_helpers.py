@@ -53,6 +53,64 @@ def test_goto_url_includes_domain_skills_when_enabled(tmp_path, monkeypatch):
     assert result == {"frameId": "f", "domain_skills": ["scraping.md"]}
 
 
+def test_goto_url_matches_middle_hostname_label_directory(tmp_path, monkeypatch):
+    monkeypatch.setenv("BH_DOMAIN_SKILLS", "1")
+    monkeypatch.setattr(helpers, "AGENT_WORKSPACE", tmp_path)
+    site = tmp_path / "domain-skills" / "e-cology"
+    site.mkdir(parents=True)
+    (site / "leave-request.md").write_text("hi")
+    with patch("browser_harness.helpers.cdp", return_value={"frameId": "f"}):
+        result = helpers.goto_url("https://enterprise.e-cology.com.cn/spa/workflow")
+    assert result == {"frameId": "f", "domain_skills": ["leave-request.md"]}
+
+
+def test_goto_url_matches_dashed_directory_for_dotted_host(tmp_path, monkeypatch):
+    monkeypatch.setenv("BH_DOMAIN_SKILLS", "1")
+    monkeypatch.setattr(helpers, "AGENT_WORKSPACE", tmp_path)
+    site = tmp_path / "domain-skills" / "ly-com"
+    site.mkdir(parents=True)
+    (site / "scraping.md").write_text("hi")
+    with patch("browser_harness.helpers.cdp", return_value={"frameId": "f"}):
+        result = helpers.goto_url("https://www.ly.com/hotels")
+    assert result == {"frameId": "f", "domain_skills": ["scraping.md"]}
+
+
+def test_goto_url_matches_directory_via_hosts_alias_file(tmp_path, monkeypatch):
+    monkeypatch.setenv("BH_DOMAIN_SKILLS", "1")
+    monkeypatch.setattr(helpers, "AGENT_WORKSPACE", tmp_path)
+    site = tmp_path / "domain-skills" / "hackernews"
+    site.mkdir(parents=True)
+    (site / "scraping.md").write_text("hi")
+    (site / "hosts").write_text("news.ycombinator.com\nhn.algolia.com\n")
+    with patch("browser_harness.helpers.cdp", return_value={"frameId": "f"}):
+        result = helpers.goto_url("https://news.ycombinator.com/item?id=1")
+    assert result == {"frameId": "f", "domain_skills": ["scraping.md"]}
+
+
+def test_goto_url_unmatched_host_returns_plain_result(tmp_path, monkeypatch):
+    monkeypatch.setenv("BH_DOMAIN_SKILLS", "1")
+    monkeypatch.setattr(helpers, "AGENT_WORKSPACE", tmp_path)
+    _seed_skill(tmp_path)
+    with patch("browser_harness.helpers.cdp", return_value={"frameId": "f"}):
+        result = helpers.goto_url("https://unrelated.org/")
+    assert result == {"frameId": "f"}
+
+
+def test_new_tab_includes_domain_skills_when_enabled(tmp_path, monkeypatch):
+    monkeypatch.setenv("BH_DOMAIN_SKILLS", "1")
+    monkeypatch.setattr(helpers, "AGENT_WORKSPACE", tmp_path)
+    _seed_skill(tmp_path)
+    monkeypatch.setattr(helpers, "current_tab", lambda: {"url": "https://busy.org/", "targetId": "t0"})
+    monkeypatch.setattr(helpers, "switch_tab", lambda tid: "sid")
+    def fake_cdp(method, **kwargs):
+        if method == "Target.createTarget":
+            return {"targetId": "t1"}
+        return {"frameId": "f"}
+    with patch("browser_harness.helpers.cdp", side_effect=fake_cdp):
+        result = helpers.new_tab("https://www.example.com/")
+    assert result == {"targetId": "t1", "target_id": "t1", "domain_skills": ["scraping.md"]}
+
+
 def test_page_info_raises_clear_error_on_js_exception():
     def fake_send(req):
         return {}

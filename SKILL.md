@@ -128,4 +128,4 @@ If you get stuck on a browser mechanic, check https://github.com/browser-use/bro
 
 Only applies when `BH_DOMAIN_SKILLS=1`. Otherwise ignore domain skills.
 
-When enabled, search `$BH_AGENT_WORKSPACE/domain-skills/<host>/` before inventing an approach. `goto_url(...)` returns up to 10 skill filenames for the navigated host.
+When enabled, search `$BH_AGENT_WORKSPACE/domain-skills/<host>/` before inventing an approach. `goto_url(...)` and `new_tab(...)` return up to 10 skill filenames for the navigated host. A skill directory matches by name against the full hostname, any label, or any dotted suffix (dots/dashes/underscores ignored), or via an optional `hosts` file in the directory listing its hostnames.

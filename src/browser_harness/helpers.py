@@ -127,12 +127,37 @@ def _is_illegal_return_error(exc):
 
 
 # --- navigation / page ---
+def _domain_skills(url):
+    """Skill filenames for the navigated host, or None (see SKILL.md Domain Skills).
+
+    A domain-skills/<dir> matches when its name equals the full hostname, any
+    dotted suffix, or any single label (compared ignoring '.', '-', '_'), or
+    when the dir contains a `hosts` file listing the hostname or a suffix."""
+    if os.environ.get("BH_DOMAIN_SKILLS") != "1":
+        return None
+    host = (urlparse(url).hostname or "").removeprefix("www.").lower()
+    root = AGENT_WORKSPACE / "domain-skills"
+    if not host or not root.is_dir():
+        return None
+    parts = host.split(".")
+    cands = {host} | set(parts) | {".".join(parts[i:]) for i in range(1, len(parts))}
+    norm = lambda s: s.lower().replace(".", "").replace("-", "").replace("_", "")
+    ncands = {norm(c) for c in cands}
+    out = set()
+    for d in sorted(root.iterdir()):
+        if not d.is_dir():
+            continue
+        hosts_file = d / "hosts"
+        aliases = hosts_file.read_text().split() if hosts_file.is_file() else []
+        if norm(d.name) in ncands or any(a.lower().removeprefix("www.") in cands for a in aliases):
+            out.update(p.name for p in d.rglob("*.md"))
+    return sorted(out)[:10] or None
+
+
 def goto_url(url):
     r = cdp("Page.navigate", url=url)
-    if os.environ.get("BH_DOMAIN_SKILLS") != "1":
-        return r
-    d = (AGENT_WORKSPACE / "domain-skills" / (urlparse(url).hostname or "").removeprefix("www.").split(".")[0])
-    return {**r, "domain_skills": sorted(p.name for p in d.rglob("*.md"))[:10]} if d.is_dir() else r
+    skills = _domain_skills(url)
+    return {**r, "domain_skills": skills} if skills else r
 
 def page_info():
     """{url, title, w, h, sx, sy, pw, ph} — viewport + scroll + page size.
@@ -305,6 +330,12 @@ def switch_tab(target):
     _mark_tab()
     return sid
 
+def _tab_result(tid, nav):
+    if isinstance(nav, dict) and nav.get("domain_skills"):
+        return {"targetId": tid, "target_id": tid, "domain_skills": nav["domain_skills"]}
+    return tid
+
+
 def new_tab(url="about:blank"):
     # Always create blank, then goto: passing url to createTarget races with
     # attach, so the brief about:blank is "complete" by the time the caller
@@ -314,14 +345,14 @@ def new_tab(url="about:blank"):
             cur = current_tab()
             cur_url = cur.get("url") or ""
             if cur_url in ("", "about:blank") or cur_url.startswith("about:blank#"):
-                goto_url(url)
-                return cur.get("targetId") or cur.get("target_id")
+                nav = goto_url(url)
+                return _tab_result(cur.get("targetId") or cur.get("target_id"), nav)
         except Exception:
             pass
     tid = cdp("Target.createTarget", url="about:blank")["targetId"]
     switch_tab(tid)
     if url != "about:blank":
-        goto_url(url)
+        return _tab_result(tid, goto_url(url))
     return tid
 
 def close_tab(target=None):
