@@ -3,6 +3,8 @@
 `https://enterprise.e-cology.com.cn` — 泛微 OA 演示环境（维森集团，演示账号已登录）。
 Field-tested against enterprise.e-cology.com.cn on 2026-07-04。
 
+> **⚠️ 先确认 workflowid 再套配方。** e-cology 里 skill 的作用域是 **workflow（表单）**，不是业务流程名：同叫"请假"的两个 workflow，字段 id、_key、挂载的校验事件完全不同，等于两个不同的站点。动手前先 `js("JSON.stringify(WfForm.getBaseInfo())")` 看 `workflowid`，或看 URL——本文件只覆盖 243 和 508，遇到其他 workflowid 需按本文件的探索套路重新摸字段（约 10 分钟）。用户手动进入的菜单入口和拿到的链接可能指向不同 workflow（实测混淆过一次：门户菜单进的是 508，复制的链接却是 243）。
+
 **演示环境有两个并行的请假流程，行为不同，选对流程比选对假期类型更重要：**
 
 | | workflowid=243「员工请假流程」 | workflowid=508「员工请假申请单」 |
