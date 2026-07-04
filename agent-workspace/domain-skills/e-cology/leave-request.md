@@ -22,7 +22,11 @@ Field-tested against enterprise.e-cology.com.cn on 2026-07-04。
 
 ## 字段映射（workflowid=508「员工请假申请单」实测）
 
-创建 URL：`.../index.html?_rdm=1#/main/workflow/req?iscreate=1&workflowid=508&_key=cg05wc&...`
+创建页完整 URL（`_rdm` 为任意时间戳，写 1 即可）：
+
+```
+https://enterprise.e-cology.com.cn/spa/workflow/static4form/index.html?_rdm=1#/main/workflow/req?iscreate=1&beagenter=&f_weaver_belongto_usertype=0&f_weaver_belongto_userid=&workflowid=508&isagent=&_key=cg05wc
+```
 
 | 字段 | field id | 说明 |
 |------|----------|------|
