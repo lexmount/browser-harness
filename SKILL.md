@@ -13,16 +13,19 @@ Domain skills are off by default. Set `BH_DOMAIN_SKILLS=1` to enable them; see t
 
 ## Usage
 
+Default to the Lexmount cloud browser via `bh-lex` — it runs `browser-harness`
+on a hosted browser (fresh IP, no local Chrome needed) and is what skill
+exploration should use unless the task specifically needs the user's own Chrome:
+
 ```bash
-browser-harness <<'PY'
+bh-lex <<'PY'
 print(page_info())
 PY
 ```
 
-- Invoke as `browser-harness`. Use heredocs for multi-line commands.
-- Helpers are pre-imported. `run.py` calls `ensure_daemon()` before `exec`.
-- First navigation is `new_tab(url)`, not `goto_url(url)`.
-- The normal local flow attaches to the running Chrome/Chromium CDP endpoint. No browser ids or local profile selection.
+- `bh-lex` (default): connectionless cloud browser, state persists across calls, nothing to clean up. `BH_LEX_REGION=cn|en` picks the project. For parallel/isolated work use `BH_LEX_ISOLATED=1 BU_NAME=<key>` and tear down with `bh-lex --close`.
+- `browser-harness` (same helpers): use directly when you need the user's **local** Chrome; it attaches to the running Chrome/Chromium CDP endpoint.
+- Both: heredocs for multi-line commands; helpers are pre-imported; first navigation is `new_tab(url)`, not `goto_url(url)`.
 
 ## Local Chrome
 
