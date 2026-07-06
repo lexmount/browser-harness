@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
 """bh-lex — run browser-harness against a Lexmount cloud browser via the SDK.
 
-Default browser for skill exploration: provisions (and reuses) an ephemeral
-Lexmount session, wires BU_CDP_WS, and runs `./browser-harness` with your stdin.
-No manual session juggling.
+Default browser for skill exploration. Two modes, both driven by the official
+`lexmount` Python SDK / connection endpoint (see lexmount-python-sdk-quickstart):
+
+  1. Connectionless (default): connect to the project's pooled cloud browser via
+     wss://<host>/connection?project_id=&api_key= — no session to create, close,
+     or leak. State (tabs/cookies) persists across calls. One browser per project,
+     so this is for serial/interactive exploration.
+
+  2. Isolated (BH_LEX_ISOLATED=1): create a dedicated ephemeral session per BU_NAME
+     via sessions.create() for parallel work; reused across calls, closed with
+     `bh-lex --close`.
 
 Usage:
-  bh-lex <<'PY'            # provision/reuse a session, run browser-harness
+  bh-lex <<'PY'                 # connectionless: run browser-harness on the cloud browser
   print(page_info())
   PY
 
-  bh-lex --close           # close the cached session for this BU_NAME/region
+  BH_LEX_ISOLATED=1 BU_NAME=job7 bh-lex <<'PY' ... PY   # dedicated browser for parallel use
+  BH_LEX_ISOLATED=1 BU_NAME=job7 bh-lex --close          # tear it down
 
 Env:
-  BH_LEX_REGION=cn|en      # which Lexmount project (default cn)
-  BU_NAME=<pool>           # session-pool key; reused across calls (default: bh-lex-<region>)
-  LEXMOUNT_API_KEY / _PROJECT_ID / _BASE_URL           (cn creds)
-  LEXMOUNT_API_KEY_EN / _PROJECT_ID_EN / _BASE_URL_EN  (en creds)
+  BH_LEX_REGION=cn|en           # which Lexmount project (default cn)
+  BH_LEX_ISOLATED=1             # use a dedicated session instead of the pooled browser
+  BU_NAME=<pool>               # session key in isolated mode (default: bh-lex-<region>)
+  LEXMOUNT_API_KEY / _PROJECT_ID / _BASE_URL            (cn creds)
+  LEXMOUNT_API_KEY_EN / _PROJECT_ID_EN / _BASE_URL_EN   (en creds)
 Creds are read from these vars or from ~/.claude/skills/lexmount-browser/.env.
 """
 import os, sys, json, subprocess, pathlib, importlib.util
+from urllib.parse import urlparse, urlencode, urlunparse
 
 REPO = pathlib.Path(__file__).resolve().parent
 SKILL = pathlib.Path.home() / ".claude/skills/lexmount-browser"
@@ -45,13 +56,20 @@ def _creds(region):
     key = e.get(f"LEXMOUNT_API_KEY{sfx}") or e.get("LEXMOUNT_API_KEY")
     pid = e.get(f"LEXMOUNT_PROJECT_ID{sfx}") or e.get("LEXMOUNT_PROJECT_ID")
     base = e.get(f"LEXMOUNT_BASE_URL{sfx}") or e.get("LEXMOUNT_BASE_URL")
-    if not key or not pid:
-        sys.exit(f"bh-lex: missing Lexmount creds for region={region} (set LEXMOUNT_API_KEY{sfx}/_PROJECT_ID{sfx})")
+    if not key or not pid or not base:
+        sys.exit(f"bh-lex: missing Lexmount creds for region={region} (LEXMOUNT_API_KEY{sfx}/_PROJECT_ID{sfx}/_BASE_URL{sfx})")
     return key, pid, base
 
 
+def connectionless_url(region):
+    key, pid, base = _creds(region)
+    p = urlparse(base)
+    scheme = "wss" if p.scheme == "https" else "ws"
+    query = urlencode({"project_id": pid, "api_key": key})
+    return urlunparse((scheme, p.netloc, "/connection", "", query, ""))
+
+
 def _sdk():
-    # lexmount SDK lives in the skill's venv; import it from there.
     for cand in SKILL.glob(".venv/lib/python*/site-packages"):
         sys.path.insert(0, str(cand))
     if importlib.util.find_spec("lexmount") is None:
@@ -61,9 +79,8 @@ def _sdk():
 
 
 def _client(region):
-    lexmount = _sdk()
     key, pid, base = _creds(region)
-    return lexmount.Lexmount(api_key=key, project_id=pid, base_url=base), lexmount
+    return _sdk().Lexmount(api_key=key, project_id=pid, base_url=base)
 
 
 def _statefile(name):
@@ -71,36 +88,31 @@ def _statefile(name):
     return STATE_DIR / f"{name}.json"
 
 
-def _alive(client, session_id):
-    try:
-        s = client.sessions.get(session_id)
-        return getattr(s, "status", "") == "active"
-    except Exception:
-        return False
-
-
-def ensure_session(region, name):
-    client, _ = _client(region)
+def isolated_url(region, name):
+    client = _client(region)
     sf = _statefile(name)
     if sf.is_file():
         st = json.loads(sf.read_text())
-        if _alive(client, st.get("session_id", "")):
-            client.close()
-            return st["connect_url"]
+        try:
+            if getattr(client.sessions.get(st["session_id"]), "status", "") == "active":
+                client.close()
+                return st["connect_url"]
+        except Exception:
+            pass
     s = client.sessions.create(browser_mode="normal")   # ephemeral: no persistent context
     url = s.connect_url or s.ws
-    sf.write_text(json.dumps({"session_id": s.session_id, "connect_url": url, "region": region}))
+    sf.write_text(json.dumps({"session_id": s.session_id, "connect_url": url}))
     client.close()
     return url
 
 
-def close_session(region, name):
+def close_isolated(region, name):
     sf = _statefile(name)
     if not sf.is_file():
         print("bh-lex: no cached session")
         return
     st = json.loads(sf.read_text())
-    client, _ = _client(region)
+    client = _client(region)
     try:
         client.sessions.delete(session_id=st["session_id"])
         print(f"bh-lex: closed {st['session_id']}")
@@ -108,19 +120,22 @@ def close_session(region, name):
         print(f"bh-lex: close failed ({e}); clearing cache anyway")
     finally:
         client.close()
-    sf.unlink(missing_ok=True)
+        sf.unlink(missing_ok=True)
 
 
 def main():
     region = os.environ.get("BH_LEX_REGION", "cn").lower()
+    isolated = os.environ.get("BH_LEX_ISOLATED") == "1"
     name = os.environ.get("BU_NAME") or f"bh-lex-{region}"
     if "--close" in sys.argv[1:]:
-        close_session(region, name)
+        if isolated:
+            close_isolated(region, name)
+        else:
+            print("bh-lex: connectionless mode has no session to close (pooled browser is platform-managed)")
         return
-    url = ensure_session(region, name)
+    url = isolated_url(region, name) if isolated else connectionless_url(region)
     env = {**os.environ, "BU_CDP_WS": url, "BU_NAME": name}
-    code = sys.stdin.buffer.read()
-    r = subprocess.run([str(REPO / "browser-harness")], input=code, env=env)
+    r = subprocess.run([str(REPO / "browser-harness")], input=sys.stdin.buffer.read(), env=env)
     sys.exit(r.returncode)
 
 
