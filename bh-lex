@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+"""bh-lex — run browser-harness against a Lexmount cloud browser via the SDK.
+
+Default browser for skill exploration: provisions (and reuses) an ephemeral
+Lexmount session, wires BU_CDP_WS, and runs `./browser-harness` with your stdin.
+No manual session juggling.
+
+Usage:
+  bh-lex <<'PY'            # provision/reuse a session, run browser-harness
+  print(page_info())
+  PY
+
+  bh-lex --close           # close the cached session for this BU_NAME/region
+
+Env:
+  BH_LEX_REGION=cn|en      # which Lexmount project (default cn)
+  BU_NAME=<pool>           # session-pool key; reused across calls (default: bh-lex-<region>)
+  LEXMOUNT_API_KEY / _PROJECT_ID / _BASE_URL           (cn creds)
+  LEXMOUNT_API_KEY_EN / _PROJECT_ID_EN / _BASE_URL_EN  (en creds)
+Creds are read from these vars or from ~/.claude/skills/lexmount-browser/.env.
+"""
+import os, sys, json, subprocess, pathlib, importlib.util
+
+REPO = pathlib.Path(__file__).resolve().parent
+SKILL = pathlib.Path.home() / ".claude/skills/lexmount-browser"
+STATE_DIR = pathlib.Path(os.environ.get("XDG_CONFIG_HOME", pathlib.Path.home()/".config")) / "browser-harness" / "lex"
+
+
+def _load_env():
+    env = {}
+    envfile = SKILL / ".env"
+    if envfile.is_file():
+        for line in envfile.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                env[k.strip()] = v.strip()
+    env.update({k: v for k, v in os.environ.items() if k.startswith("LEXMOUNT_")})
+    return env
+
+
+def _creds(region):
+    e = _load_env()
+    sfx = "_EN" if region == "en" else ""
+    key = e.get(f"LEXMOUNT_API_KEY{sfx}") or e.get("LEXMOUNT_API_KEY")
+    pid = e.get(f"LEXMOUNT_PROJECT_ID{sfx}") or e.get("LEXMOUNT_PROJECT_ID")
+    base = e.get(f"LEXMOUNT_BASE_URL{sfx}") or e.get("LEXMOUNT_BASE_URL")
+    if not key or not pid:
+        sys.exit(f"bh-lex: missing Lexmount creds for region={region} (set LEXMOUNT_API_KEY{sfx}/_PROJECT_ID{sfx})")
+    return key, pid, base
+
+
+def _sdk():
+    # lexmount SDK lives in the skill's venv; import it from there.
+    for cand in SKILL.glob(".venv/lib/python*/site-packages"):
+        sys.path.insert(0, str(cand))
+    if importlib.util.find_spec("lexmount") is None:
+        sys.exit("bh-lex: lexmount SDK not found — is the lexmount-browser skill installed?")
+    import lexmount
+    return lexmount
+
+
+def _client(region):
+    lexmount = _sdk()
+    key, pid, base = _creds(region)
+    return lexmount.Lexmount(api_key=key, project_id=pid, base_url=base), lexmount
+
+
+def _statefile(name):
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    return STATE_DIR / f"{name}.json"
+
+
+def _alive(client, session_id):
+    try:
+        s = client.sessions.get(session_id)
+        return getattr(s, "status", "") == "active"
+    except Exception:
+        return False
+
+
+def ensure_session(region, name):
+    client, _ = _client(region)
+    sf = _statefile(name)
+    if sf.is_file():
+        st = json.loads(sf.read_text())
+        if _alive(client, st.get("session_id", "")):
+            client.close()
+            return st["connect_url"]
+    s = client.sessions.create(browser_mode="normal")   # ephemeral: no persistent context
+    url = s.connect_url or s.ws
+    sf.write_text(json.dumps({"session_id": s.session_id, "connect_url": url, "region": region}))
+    client.close()
+    return url
+
+
+def close_session(region, name):
+    sf = _statefile(name)
+    if not sf.is_file():
+        print("bh-lex: no cached session")
+        return
+    st = json.loads(sf.read_text())
+    client, _ = _client(region)
+    try:
+        client.sessions.delete(session_id=st["session_id"])
+        print(f"bh-lex: closed {st['session_id']}")
+    except Exception as e:
+        print(f"bh-lex: close failed ({e}); clearing cache anyway")
+    finally:
+        client.close()
+    sf.unlink(missing_ok=True)
+
+
+def main():
+    region = os.environ.get("BH_LEX_REGION", "cn").lower()
+    name = os.environ.get("BU_NAME") or f"bh-lex-{region}"
+    if "--close" in sys.argv[1:]:
+        close_session(region, name)
+        return
+    url = ensure_session(region, name)
+    env = {**os.environ, "BU_CDP_WS": url, "BU_NAME": name}
+    code = sys.stdin.buffer.read()
+    r = subprocess.run([str(REPO / "browser-harness")], input=code, env=env)
+    sys.exit(r.returncode)
+
+
+if __name__ == "__main__":
+    main()
