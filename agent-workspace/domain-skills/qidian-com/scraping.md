@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 (retested 2026-07-06)
+Field-tested on 2026-07-04 (retested 2026-07-06) (re-verified 2026-07-06)
 
 起点中文网 (qidian.com) 小说搜索/书籍元数据抓取。搜一本书，拿作者、总字数、连载状态、书籍详情页 URL。
 

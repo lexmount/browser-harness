@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 
 V2EX (www.v2ex.com) node topic listings: extract the page-1 topic list (titles + reply counts) for any node via **local http_get** on the node HTML page. The cloud browser (Hong Kong exit IP) does NOT work here — see Gotchas.
 

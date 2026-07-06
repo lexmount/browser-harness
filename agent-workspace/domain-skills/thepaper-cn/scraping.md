@@ -1,6 +1,6 @@
 # thepaper.cn (澎湃新闻) — search & article scraping
 
-Field-tested on 2026-07-04. Full-text news search on 澎湃新闻 via one un-authenticated JSON POST endpoint; time-sorted results with title / publish-time / source.
+Field-tested on 2026-07-04 (re-verified 2026-07-06). Full-text news search on 澎湃新闻 via one un-authenticated JSON POST endpoint; time-sorted results with title / publish-time / source.
 
 ## Do this first — the JSON search API (no login, no browser needed)
 

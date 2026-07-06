@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 — wanwang.aliyun.com (阿里云万网) 域名注册查询：查任意域名各后缀的首年注册价 / 续费价 / 可注册状态。
+Field-tested on 2026-07-04 (re-verified 2026-07-06) — wanwang.aliyun.com (阿里云万网) 域名注册查询：查任意域名各后缀的首年注册价 / 续费价 / 可注册状态。
 
 ## Do this first (最优路径：搜索结果页 + checkapi JSON)
 
