@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 搜狗网页搜索 (sogou.com/web) — 关键词直达 URL，结果页自带富答案框，官方通知走 /link 重定向解析到源站。
 
 ## Do this first (最优路径)

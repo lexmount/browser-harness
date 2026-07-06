@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 — 第一财经 (yicai.com): homepage carries live index quotes (incl. NASDAQ Composite) server-rendered in HTML; site search is a clean免登录 JSON API. Both work from local-IP http_get (China mainland); no cloud browser needed.
+Field-tested on 2026-07-04 (re-verified 2026-07-06) — 第一财经 (yicai.com): homepage carries live index quotes (incl. NASDAQ Composite) server-rendered in HTML; site search is a clean免登录 JSON API. Both work from local-IP http_get (China mainland); no cloud browser needed.
 
 ## Do this first
 

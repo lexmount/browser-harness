@@ -1,6 +1,6 @@
 # stcn.com (证券时报网) — scraping
 
-Field-tested on 2026-07-06 — 证券时报官方网站；股市/行情新闻走「投资」频道，正文页服务端渲染、无反爬、本地 http_get 直取。
+Field-tested on 2026-07-06 (re-verified 2026-07-06) — 证券时报官方网站；股市/行情新闻走「投资」频道，正文页服务端渲染、无反爬、本地 http_get 直取。
 
 ## 站点结构（实测）
 - 顶部导航没有字面「股市」频道。**股市新闻 = 「投资」频道** `https://www.stcn.com/article/list/investment.html`（覆盖 A股/港股/涨停/解禁/板块等股市内容）。

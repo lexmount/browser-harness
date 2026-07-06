@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 jiemian.com (界面新闻) keyword search: results are server-rendered HTML on a.jiemian.com; grab title/author/time/url with plain HTTP or browser JS. No login, no anti-bot on the search endpoint.
 
 ## Do this first (fastest, no browser needed)

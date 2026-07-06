@@ -1,4 +1,4 @@
-Field-tested on 2026-07-06 — skyscanner.com flight search & results extraction. Site is behind PerimeterX (PX) bot protection; the Lexmount Hong Kong cloud IP gets hard-blocked, so read the Gotchas FIRST.
+Field-tested on 2026-07-06 (re-verified 2026-07-06) — skyscanner.com flight search & results extraction. Site is behind PerimeterX (PX) bot protection; the Lexmount Hong Kong cloud IP gets hard-blocked, so read the Gotchas FIRST. Re-verification reproduced every finding exactly: first fresh-session homepage load renders real content; direct /transport/flights/ URL nav trips the PX press-and-hold captcha instantly; the HK egress IP is flagged after 1-2 requests so even a second homepage load returns the captcha; local http_get HTML → 708-byte SPA stub, JSON APIs → HTTP 403.
 
 # Skyscanner — Scraping & Data Extraction
 

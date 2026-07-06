@@ -1,6 +1,6 @@
 # NCBI PubMed Central (PMC) — Scraping & Data Extraction
 
-Field-tested on 2026-07-06. `www.ncbi.nlm.nih.gov` / `pmc.ncbi.nlm.nih.gov` — PubMed Central full-text archive. **Never use the cloud browser for PMC search; use `http_get` + the NCBI E-utilities REST API (`db=pmc`).** No login, no API key needed (a free key raises the rate limit from 3 to 10 req/s).
+Field-tested on 2026-07-06 (re-verified 2026-07-06). `www.ncbi.nlm.nih.gov` / `pmc.ncbi.nlm.nih.gov` — PubMed Central full-text archive. **Never use the cloud browser for PMC search; use `http_get` + the NCBI E-utilities REST API (`db=pmc`).** No login, no API key needed (a free key raises the rate limit from 3 to 10 req/s).
 
 Task this skill covers: *Search "CRISPR gene editing" on PubMed Central, filter review articles, list top results' title / authors / year.*
 

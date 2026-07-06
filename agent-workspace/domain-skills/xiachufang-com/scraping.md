@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 — xiachufang.com (下厨房): search recipes and read name/author/综合评分 from the server-rendered search results HTML.
+Field-tested on 2026-07-04 (re-verified 2026-07-06) — xiachufang.com (下厨房): search recipes and read name/author/综合评分 from the server-rendered search results HTML.
 
 ## Do this first (fastest, no browser needed)
 

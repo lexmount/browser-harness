@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 — xueqiu.com (雪球): resolve a stock keyword → symbol, then pull its discussion timeline as clean JSON. No login needed; run everything inside the Lexmount cloud browser via `js(fetch(..., {credentials:'include'}))` so the anonymous xq cookie rides along.
+Field-tested on 2026-07-04 (re-verified 2026-07-06) — xueqiu.com (雪球): resolve a stock keyword → symbol, then pull its discussion timeline as clean JSON. No login needed; run everything inside the Lexmount cloud browser via `js(fetch(..., {credentials:'include'}))` so the anonymous xq cookie rides along.
 
 ## Do this first (keyword → symbol → discussion posts)
 
