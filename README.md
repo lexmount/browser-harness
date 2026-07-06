@@ -46,6 +46,37 @@ Stealth, sub-agents, or headless deployment.<br>
 - Grab a key at [cloud.browser-use.com/new-api-key](https://cloud.browser-use.com/new-api-key)
 - Or let the agent sign up itself via [docs.browser-use.com/llms.txt](https://docs.browser-use.com/llms.txt) (setup flow + challenge context included).
 
+## Lexmount cloud browser (`bh-lex`)
+
+`bh-lex` runs `browser-harness` on a hosted [Lexmount](https://lexmount.cn) browser (fresh IP, no local Chrome) and is the default for skill exploration.
+
+```bash
+bh-lex <<'PY'
+new_tab("https://example.com"); print(page_info())
+PY
+```
+
+**Configure credentials** in any of these (checked low→high precedence), so real env vars always win:
+
+1. `~/.claude/skills/lexmount-browser/.env` (if you use the lexmount-browser skill)
+2. `${XDG_CONFIG_HOME:-~/.config}/browser-harness/lexmount.env`
+3. exported `LEXMOUNT_*` environment variables
+
+```bash
+# ~/.config/browser-harness/lexmount.env
+LEXMOUNT_API_KEY=...
+LEXMOUNT_PROJECT_ID=...
+LEXMOUNT_BASE_URL=https://api.lexmount.cn
+# optional second region, selected with BH_LEX_REGION=en
+LEXMOUNT_API_KEY_EN=...
+LEXMOUNT_PROJECT_ID_EN=...
+LEXMOUNT_BASE_URL_EN=https://api.lexmount.com
+```
+
+- Default mode is **connectionless**: attaches to the project's pooled cloud browser — nothing to create, close, or leak; tab/cookie state persists across calls.
+- `BH_LEX_REGION=cn|en` selects the project (default `cn`).
+- `BH_LEX_ISOLATED=1 BU_NAME=<key>` provisions a dedicated ephemeral session per key for parallel work; tear it down with `bh-lex --close`.
+
 ## Architecture (~1k lines across 4 core files)
 
 - `install.md` — first-time install and browser bootstrap

@@ -27,7 +27,8 @@ Env:
   BU_NAME=<pool>               # session key in isolated mode (default: bh-lex-<region>)
   LEXMOUNT_API_KEY / _PROJECT_ID / _BASE_URL            (cn creds)
   LEXMOUNT_API_KEY_EN / _PROJECT_ID_EN / _BASE_URL_EN   (en creds)
-Creds are read from these vars or from ~/.claude/skills/lexmount-browser/.env.
+Creds are read from (low->high precedence): the lexmount-browser skill's .env,
+then ~/.config/browser-harness/lexmount.env, then real LEXMOUNT_* env vars.
 """
 import os, sys, json, subprocess, pathlib, importlib.util
 from urllib.parse import urlparse, urlencode, urlunparse
@@ -38,14 +39,15 @@ STATE_DIR = pathlib.Path(os.environ.get("XDG_CONFIG_HOME", pathlib.Path.home()/"
 
 
 def _load_env():
+    # Precedence (low -> high): skill .env, then browser-harness config file, then real env vars.
     env = {}
-    envfile = SKILL / ".env"
-    if envfile.is_file():
-        for line in envfile.read_text().splitlines():
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                k, v = line.split("=", 1)
-                env[k.strip()] = v.strip()
+    for envfile in (SKILL / ".env", STATE_DIR.parent / "lexmount.env"):
+        if envfile.is_file():
+            for line in envfile.read_text().splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    env[k.strip()] = v.strip()
     env.update({k: v for k, v in os.environ.items() if k.startswith("LEXMOUNT_")})
     return env
 
