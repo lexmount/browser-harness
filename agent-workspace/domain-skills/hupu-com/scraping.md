@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 虎扑 hupu.com 帖子搜索与「步行街」板块抓取：站内搜索走 `bbs.hupu.com/search?q=<kw>`，页面把结果 SSR 进 `window.$$data`，用云浏览器 js() 直读即可，无需登录。
 
 ## Do this first（最优路径：搜索 → 提取 → 客户端排序取最热）

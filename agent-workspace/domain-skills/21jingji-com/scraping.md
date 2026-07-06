@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 21jingji.com (21世纪经济报道/21财经) — 站内文章搜索：用移动站搜索页拿结果列表（标题+日期+链接），再进详情页取来源+精确时间。
 
 ## Do this first (最优路径：云浏览器 new_tab + js DOM 提取)

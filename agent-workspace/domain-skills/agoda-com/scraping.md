@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 — Agoda hotel search: results render as DOM cards (no usable JSON API); drive it with a direct `/search` URL + `hotelStarRating` filter and extract per-card via `data-selenium` attributes.
+Field-tested on 2026-07-04 (re-verified 2026-07-06) — Agoda hotel search: results render as DOM cards (no usable JSON API); drive it with a direct `/search` URL + `hotelStarRating` filter and extract per-card via `data-selenium` attributes.
 
 ## Do this first (verified working path)
 
@@ -39,6 +39,8 @@ print(json.dumps(info, ensure_ascii=False))
 ```
 
 Verified output (2026-07-04): top 5-star result = **The Peninsula Bangkok**, `display-price` = **1,934**, currency = **HKD**. (#2 The Standard Bangkok Mahanakhon 1,156; #3 Grande Centre Point Surawong 734.)
+
+Re-verified (2026-07-06, same URL/selectors, checkIn=2026-08-01): path worked unchanged — 11 cards, currency HKD, `data-selenium` selectors all resolved. Top 5-star result rotated to **Siam Kempinski Hotel Bangkok**, `display-price` = **3,097** HKD (5-star confirmed via card text "5 stars out of 5"). (#2 Akara Hotel Bangkok 457; #3 Eastin Grand Hotel Phayathai 1,078.) The specific top hotel/price changes with dates & inventory — trust the method, not the frozen example.
 
 ## Verified selectors (per card)
 Each result card is `[data-selenium="hotel-item"]` (also carries `data-hotelid` and matches `li[data-hotelid]`). Inside a card:

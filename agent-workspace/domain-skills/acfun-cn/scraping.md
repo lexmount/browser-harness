@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 AcFun (acfun.cn) video search: extract title / UP (uploader) / play-count, sorted by views — via one no-login JSON endpoint. No anti-bot seen; both the China-IP `http_get` path and the HK cloud-browser path work.
 
 ## Do this first (best path: no-login JSON endpoint, works from http_get)
@@ -21,13 +21,17 @@ u = ("https://www.acfun.cn/search?sortType=2&channelId=0&type=video&keyword="
 r = http_get(u, headers={"X-Requested-With":"XMLHttpRequest",
                          "Referer":"https://www.acfun.cn/",
                          "User-Agent":"Mozilla/5.0"})
-body = r.get("body") if isinstance(r, dict) else r
-data = json.loads(str(body))          # {"html": "...normal-list fragment..."}
+body = str(r.get("body") if isinstance(r, dict) else r)
+# NOTE (2026-07-06): ajaxpipe now appends "/*<!-- fetch-stream -->*/" after the JSON,
+# so json.loads(body) raises "Extra data". Decode ONLY the first JSON object:
+data, _ = json.JSONDecoder().raw_decode(body)   # {"html": "...normal-list fragment..."}
 html = data["html"]
 # Each result block: <div class="search-video" data-exposure-log='{"title":..,"content_id":..,"authorId":..}'>
-# UP name in <a href="/u/<id>">NAME</a> ; play count in <span class="info__view-count">255.6万次播放</span>
-titles = re.findall(r'"title":"(.*?)"', html)          # from data-exposure-log, in list order
-ups    = re.findall(r'/u/\d+"[^>]*>([^<]+)</a>', html)
+# play count in <span class="info__view-count">255.6万次播放</span>
+titles = re.findall(r'"title":"(.*?)"', html)          # from data-exposure-log, in list order (title repeats ~3x/block)
+# UP name (2026-07-06): the /u/ link now wraps an <img> avatar, so the old
+# `/u/\d+"[^>]*>([^<]+)</a>` grabs nothing. Read the dedicated span instead:
+ups    = re.findall(r'<span class="user-name">([^<]+)</span>', html)
 plays  = re.findall(r'info__view-count[^>]*>([^<]+)<', html)
 print(titles[0], "| UP:", ups[0], "|", plays[0])
 # -> 2017鬼畜调教年度金曲精选 | UP: AcFun专题 | 255.6万次播放
@@ -48,7 +52,7 @@ rows = js("""(async function(){
   var out=[];
   for(var i=0;i<Math.min(vids.length,10);i++){var v=vids[i];
     var log={};try{log=JSON.parse(v.getAttribute('data-exposure-log'))}catch(e){}
-    var ua=v.querySelector('a[href*="/u/"]');
+    var ua=v.querySelector('.user-name')||v.querySelector('a[href*="/u/"]'); // 2026-07-06: name moved into span.user-name
     var pc=v.querySelector('.info__view-count');
     out.push({title:log.title, up:ua?ua.textContent.trim():'',
               play:pc?pc.textContent.trim():'', acid:'ac'+log.content_id});
@@ -67,6 +71,8 @@ wait(3)
 Selectors on the page: result block `.search-video`; title in its `data-exposure-log` JSON attr (`title`, `content_id`, `authorId`); UP link `a[href*="/u/"]`; play count `span.info__view-count`.
 
 ## Gotchas
+- **(2026-07-06) ajaxpipe body is no longer a bare JSON object.** It now ends with a trailing `/*<!-- fetch-stream -->*/` marker, so `json.loads(body)` raises `JSONDecodeError: Extra data`. Use `json.JSONDecoder().raw_decode(body)` and take the first object (the browser/DOMParser variant is unaffected — `fetch(...).text()` there still parses because it reads only the streamed html chunk... actually use `raw_decode` if you ever `JSON.parse` the raw body).
+- **(2026-07-06) UP-name markup changed.** Each `<a href="/u/<id>">` now wraps an `<img class="user-avatar">` followed by `<span class="user-name">NAME</span>`, so the old `/u/\d+"[^>]*>([^<]+)</a>` matches the `<img` and yields nothing. Grab the name from `re.findall(r'<span class="user-name">([^<]+)</span>', html)` (or, in the DOM variant, `v.querySelector('.user-name').textContent`). The `authorId` is still in the exposure-log JSON if you only need the id.
 - **The default/visible search list is NOT view-sorted.** The page keeps two lists: `#complex-list` (relevance, shown by default) and `.normal-list` (the sortType list, hidden). If you read `.search-video` blindly off the loaded page you'll grab the relevance order. Always target `.normal-list` (or use the ajaxpipe endpoint, whose fragment IS `.normal-list`).
 - **Don't regex `次播放` off a whole `.search-video` innerText** — it also contains "N条弹幕" (danmaku count), and greedy/global matches concatenate numbers (saw bogus "7122.5万"/"233374.3万"). Use the dedicated `span.info__view-count` element, or parse each field from its own node. Play counts are strings like `255.6万次播放` (万 = 10k); convert if you need a number.
 - **Play count is not monotonic vs. relevance rank** — proof the sort matters: relevance rank #2 had 14.5万 while a lower relevance item had 151.8万. Only `sortType=2`'s `.normal-list` is truly descending by views.

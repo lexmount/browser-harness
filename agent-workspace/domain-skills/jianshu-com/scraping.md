@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 (jianshu.com) — site search returns SEO-spam-heavy notes; extract title/author/read-count from the server-rendered `ul.note-list` DOM, and use the "热门文章" (top) sort tab for hottest ranking.
+Field-tested on 2026-07-04 (re-verified 2026-07-06) (jianshu.com) — site search returns SEO-spam-heavy notes; extract title/author/read-count from the server-rendered `ul.note-list` DOM, and use the "热门文章" (top) sort tab for hottest ranking.
 
 ## Do this first (verified path: navigate + click sort tab + DOM extract via js)
 
