@@ -1,7 +1,15 @@
 # eBay — Scraping & Data Extraction
 
-Field-tested against ebay.com on 2026-04-18 using `uv run python` with `http_get`.
-Chrome is NOT required — `http_get` returns full HTML on first access.
+Field-tested against ebay.com on 2026-04-18 using `uv run python` with `http_get`. (re-verified 2026-07-06)
+
+> **UPDATE 2026-07-06 — `http_get` now returns HTTP 403 Forbidden** for `ebay.com/sch/*` from the
+> local mainland IP (was working on 2026-04-18). The regex extractors below are still correct, but
+> you must fetch the HTML another way. **Working path 2026-07-06: the cloud browser** —
+> `new_tab(url); wait_for_load(); wait(3); html = js("document.documentElement.outerHTML")`.
+> No "Pardon Our Interruption" block hit via the cloud browser. Note the cloud browser exits via a
+> **Hong Kong IP, so prices render in HKD** and shipping/location show non-US values; force USD by
+> appending nothing special is available server-side — read prices as-is (HKD) or convert. Titles,
+> bids, and time-left are unaffected.
 
 ## Critical: Bot Detection ("Pardon Our Interruption")
 
@@ -81,11 +89,13 @@ Confirmed working URL examples:
 
 | Code | Sort Order |
 |------|-----------|
-| `1` | Best Match (default) |
-| `10` | Ending Soonest |
-| `12` | Newly Listed |
+| `12` | Best Match (default) |
+| `1` | **Ending Soonest** (verified 2026-07-06 — page shows "Sort: Time: ending soonest") |
+| `10` | **Newly Listed** (verified 2026-07-06 — page shows "Sort: Time: newly listed") |
 | `15` | Lowest Price + Shipping |
 | `16` | Highest Price |
+
+> **Corrected 2026-07-06:** the old table had `_sop=10`=Ending Soonest and `_sop=1`=Best Match — both were **wrong**. Confirmed live by reading the "Sort:" label after loading each URL: `_sop=1` is Ending Soonest, `_sop=10` is Newly Listed, `_sop=12` is Best Match. For "auctions ending soonest / within N hours" use `LH_Auction=1&_sop=1`.
 
 ### Item Detail URL
 
@@ -338,6 +348,45 @@ def extract_ux_textspans(html):
 # Pairs from [105] onward: item specifics as label/value pairs
 ```
 
+## Auctions: bids + time-left (verified 2026-07-06 via cloud browser)
+
+The HTML extractor above pulls title/price/image but **not** bids or time-left. For auction tasks
+(`LH_Auction=1`), read those two fields from the rendered card text via the cloud browser. Each
+auction card's `innerText` contains, in order: `"<N> bids · "` then a label `"Time left"` then the
+value (`"41m"`, `"1d 3h"`, `"3h 12m"`, etc.). Bid element = `span.su-styled-text.default` reading
+`"0 bids"`; the label is `span.clipped` reading `"Time left"`.
+
+```javascript
+// run via js("...") after new_tab(search_url); wait_for_load(); wait(3)
+(function(){
+  const cards=document.querySelectorAll('[data-listingid]');
+  const seen=new Set(); const out=[];
+  cards.forEach(c=>{
+    const id=c.getAttribute('data-listingid'); if(seen.has(id))return; seen.add(id);
+    const title=(c.querySelector('.s-card__title,.s-item__title,[role=heading]')||{}).innerText||"";
+    if(!title||title==='Shop on eBay')return;          // skip promoted stub
+    const full=c.innerText||"";
+    const bidM=full.match(/(\d+)\s*bids?/i);
+    let leftStr=null, hours=null;
+    const i=full.indexOf('Time left');
+    if(i>=0){
+      const m=full.slice(i+9,i+40).match(/(\d+d\s*\d+h|\d+d|\d+h\s*\d+m|\d+h|\d+m\s*\d+s|\d+m)/i);
+      if(m){ leftStr=m[1]; let h=0;
+        const d=leftStr.match(/(\d+)d/), hh=leftStr.match(/(\d+)h/), mm=leftStr.match(/(\d+)m(?!s)/);
+        if(d)h+=+d[1]*24; if(hh)h+=+hh[1]; if(mm)h+=+mm[1]/60; hours=h; }
+    }
+    const priceM=full.match(/HKD\s*[\d,]+\.\d{2}|US\s*\$[\d,]+\.\d{2}|\$[\d,]+\.\d{2}/);
+    const url=((c.querySelector('a[href*="/itm/"]')||{}).href||"").split('?')[0];
+    out.push({title,bids:bidM?+bidM[1]:null,left:leftStr,hours,price:priceM?priceM[0]:null,url});
+  });
+  return JSON.stringify(out.filter(x=>x.hours!==null && x.hours<=24).slice(0,10));
+})()
+```
+
+Verified: `?_nkw=vintage+camera&LH_Auction=1&_sop=1` returned 60 auctions/page, all with parseable
+`Time left`; with Ending-Soonest sort the whole first page is already within 24h (top items ~40-50m).
+So "ending within 24h" = `LH_Auction=1&_sop=1` + keep cards where parsed `hours<=24` (top of page 1).
+
 ## Pagination
 
 Use `_pgn=N` (confirmed working, returns ~65–88 items per page):
@@ -409,6 +458,10 @@ for item in items[:5]:
 ```
 
 ## Gotchas
+
+- **`http_get` on `/sch/*` now 403s (2026-07-06)** — local-IP `http_get` returns `HTTP Error 403: Forbidden` for search URLs even with the full Chrome UA (it worked 2026-04-18). Fall back to the cloud browser (`new_tab`+`js` reading `document.documentElement.outerHTML`), which was not blocked. Cloud browser is a HK IP → prices show in HKD.
+
+- **`_sop` codes were stale** — `_sop=1`=Ending Soonest, `_sop=10`=Newly Listed, `_sop=12`=Best Match (verified live 2026-07-06 by reading the "Sort:" label). The earlier table had 1 and 10 swapped/wrong.
 
 - **"Pardon Our Interruption" is not a CAPTCHA** — it's eBay's bot-detection interstitial. It doesn't require solving — just wait and back off. `'captcha'` does NOT appear in the blocked page.
 

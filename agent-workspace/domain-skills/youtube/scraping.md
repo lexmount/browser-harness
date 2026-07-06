@@ -1,6 +1,6 @@
 # YouTube — Data Extraction
 
-Field-tested against youtube.com on 2026-04-21.
+Field-tested against youtube.com on 2026-04-21 (re-verified 2026-07-06: Approach 3 search regex + ytInitialData path + all field selectors work verbatim on both http_get and cloud-IP js() paths).
 No authentication required for any approach documented here.
 
 ---
