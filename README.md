@@ -56,14 +56,15 @@ new_tab("https://example.com"); print(page_info())
 PY
 ```
 
-**Configure credentials** in any of these (checked low→high precedence), so real env vars always win:
+**Configure credentials** in any of these (checked low→high precedence, so real env vars always win):
 
 1. `~/.claude/skills/lexmount-browser/.env` (if you use the lexmount-browser skill)
-2. `${XDG_CONFIG_HOME:-~/.config}/browser-harness/lexmount.env`
-3. exported `LEXMOUNT_*` environment variables
+2. `${XDG_CONFIG_HOME:-~/.config}/browser-harness/lexmount.env` (global config)
+3. a project `.env` — repo root or your working dir (already gitignored)
+4. exported `LEXMOUNT_*` environment variables
 
 ```bash
-# ~/.config/browser-harness/lexmount.env
+# .env  (or ~/.config/browser-harness/lexmount.env)
 LEXMOUNT_API_KEY=...
 LEXMOUNT_PROJECT_ID=...
 LEXMOUNT_BASE_URL=https://api.lexmount.cn
@@ -73,7 +74,7 @@ LEXMOUNT_PROJECT_ID_EN=...
 LEXMOUNT_BASE_URL_EN=https://api.lexmount.com
 ```
 
-- Default mode is **connectionless**: attaches to the project's pooled cloud browser — nothing to create, close, or leak; tab/cookie state persists across calls.
+- Default mode is **connectionless**: attaches to the project's pooled cloud browser — nothing to create, close, or leak; tab/cookie state persists across calls. If that pooled browser is ever unreachable, `bh-lex` automatically falls back to a fresh ephemeral session (clean up with `bh-lex --close`).
 - `BH_LEX_REGION=cn|en` selects the project (default `cn`).
 - `BH_LEX_ISOLATED=1 BU_NAME=<key>` provisions a dedicated ephemeral session per key for parallel work; tear it down with `bh-lex --close`.
 
