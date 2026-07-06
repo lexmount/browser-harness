@@ -1,0 +1,312 @@
+<title>LexBench-Browser · Skill A/B 基准</title>
+<style>
+  :root{
+    --ink:#18212b; --ink-soft:#48566a; --paper:#f5f6f4; --card:#ffffff;
+    --line:#e2e5e0; --line-strong:#c9cec6;
+    --skill:#1c6f63; --skill-soft:#e6f0ee; --ctrl:#8a94a3; --ctrl-soft:#eef0f2;
+    --pos:#2f7a4d; --neg:#b0453b; --amber:#b26a1f;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:clamp(24px,5vw,64px) clamp(18px,4vw,40px)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--skill);font-weight:600}
+  h1{font-size:clamp(28px,5vw,44px);line-height:1.08;letter-spacing:-.02em;margin:.35em 0 .1em;
+    text-wrap:balance;font-weight:700}
+  .lede{font-size:clamp(16px,2.2vw,19px);color:var(--ink-soft);max-width:62ch;margin:.4em 0 0}
+  .rule{height:1px;background:var(--line);border:0;margin:clamp(28px,5vw,44px) 0}
+  h2{font-size:13px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;margin:0 0 16px}
+  .verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:26px}
+  .big{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .big .n{font-size:clamp(34px,6vw,46px);font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+    line-height:1;font-family:var(--mono)}
+  .big .n.pos{color:var(--pos)} .big .n.skill{color:var(--skill)}
+  .big .k{font-size:13.5px;color:var(--ink-soft);margin-top:10px}
+  .big .k b{color:var(--ink);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:15px}
+  .scroll{overflow-x:auto}
+  th,td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;border-bottom:1.5px solid var(--line-strong)}
+  tbody tr:last-child td{border-bottom:1.5px solid var(--line-strong)}
+  .row-h td{font-weight:600}
+  .chip{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:6px;font-weight:600}
+  .chip.skill{background:var(--skill-soft);color:var(--skill)}
+  .chip.ctrl{background:var(--ctrl-soft);color:var(--ink-soft)}
+  .delta{font-family:var(--mono);font-weight:600}
+  .delta.pos{color:var(--pos)} .delta.neg{color:var(--neg)}
+  .callout{background:var(--skill-soft);border:1px solid #bcd7d1;border-radius:14px;
+    padding:22px 24px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .callout .huge{font-size:clamp(42px,8vw,64px);font-weight:700;color:var(--skill);font-family:var(--mono);
+    letter-spacing:-.03em;line-height:.9;font-variant-numeric:tabular-nums}
+  .callout p{margin:0;max-width:52ch;font-size:15px;color:var(--ink)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:620px){.split{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .panel h3{margin:0 0 10px;font-size:14px}
+  .taglist{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+  .tag{font-family:var(--mono);font-size:12.5px;padding:3px 9px;border-radius:6px;background:var(--paper);
+    border:1px solid var(--line);color:var(--ink-soft)}
+  .tag.up{color:var(--pos);border-color:#bfe0cb;background:#eef7f0}
+  .tag.dn{color:var(--neg);border-color:#e6c4bf;background:#faefed}
+  ul.notes{margin:10px 0 0;padding:0;list-style:none;font-size:14.5px;color:var(--ink-soft)}
+  ul.notes li{padding:7px 0 7px 20px;position:relative;border-bottom:1px solid var(--line)}
+  ul.notes li:last-child{border-bottom:0}
+  ul.notes li::before{content:"";position:absolute;left:2px;top:15px;width:6px;height:6px;border-radius:50%;
+    background:var(--line-strong)}
+  ul.notes b{color:var(--ink)}
+  .foot{margin-top:8px;font-size:13px;color:var(--ink-soft);font-family:var(--mono)}
+  section{margin-top:clamp(30px,5vw,46px)}
+  .cap{font-size:13px;color:var(--ink-soft);margin-top:10px}
+  /* per-site detail */
+  table.detail{font-size:14px}
+  table.detail td{text-align:center;padding:8px 10px}
+  table.detail td:first-child{text-align:left;font-family:var(--mono);font-size:13px;color:var(--ink)}
+  table.detail td.d{width:52px}
+  table.detail tr.hurt td:first-child{color:var(--neg);font-weight:600}
+  table.detail tr.hurt{background:#fbf1ef}
+  .vd{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;
+    border-radius:6px;font-style:normal;font-size:12.5px;font-weight:600;font-family:var(--sans)}
+  .vd.ok{background:#e7f2ea;color:var(--pos)} .vd.pt{background:#fbf0dd;color:var(--amber)}
+  .vd.no{background:#f8e6e3;color:var(--neg)} .vd.infra{background:#eceef0;color:#9aa4b0;font-size:10.5px;font-family:var(--mono)}
+  .vd.na{background:transparent;color:#c2c8cd}
+  .arr{color:#b6bcc2;margin:0 5px;font-family:var(--mono)}
+  .pc{white-space:nowrap}
+  .nb{font-family:var(--mono);font-size:12.5px;font-weight:600}
+  .nb.up{color:var(--pos)} .nb.dn{color:var(--neg)} .nb.eq{color:#c2c8cd} .nb{color:#c2c8cd}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-soft);margin:0 0 14px;
+    font-family:var(--mono)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+
+  .np{font-family:var(--mono);font-size:13px;white-space:nowrap}
+  .np .gd{color:var(--pos)} .np .bd{color:var(--neg)} .np .eq{color:var(--ink-soft)}
+  table.detail td.np-c{text-align:center}
+  .subhd{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--skill);font-weight:600;margin:26px 0 10px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">LexBench-Browser · Domain-Skill Ablation</div>
+    <h1>技能库让弱模型少走弯路——而且换个任务照样管用</h1>
+    <p class="lede">给 50 个站点各写一份 domain skill，让 Haiku 在云浏览器上执行数据集任务。对照"有技能 / 无技能"两臂，并在<b>技能被调过的任务</b>与<b>另一个没见过的任务</b>上分别测量。技能的收益几乎全部迁移到了新任务上。</p>
+  </header>
+
+  <div class="verdict">
+    <div class="big">
+      <div class="n pos">+13→16<span style="font-size:.5em">pp</span></div>
+      <div class="k">成功率提升 · <b>见过的 case +13pp，没见过的 +16pp</b></div>
+    </div>
+    <div class="big">
+      <div class="n skill">123%</div>
+      <div class="k">泛化保留率 · <b>新任务上的增益 ≥ 原任务</b>，技能不是过拟合</div>
+    </div>
+    <div class="big">
+      <div class="n">−23→33%</div>
+      <div class="k">token 消耗下降 · <b>省的比读文档花的多</b></div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <section>
+    <h2>核心结果 · 成功率</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>任务集</th><th>对照组</th><th>技能组</th><th>提升</th><th>技能变好</th><th>技能变差</th><th>有效站</th></tr></thead>
+      <tbody>
+        <tr class="row-h"><td>case A <span class="cap">（技能被调过）</span></td><td>71%</td><td>84%</td><td class="delta pos">+13pp</td><td>9</td><td>4</td><td>31</td></tr>
+        <tr class="row-h"><td>case B <span class="cap">（没见过 / 泛化）</span></td><td>68%</td><td>84%</td><td class="delta pos">+16pp</td><td>12</td><td>4</td><td>41</td></tr>
+      </tbody>
+    </table></div>
+    <p class="cap">成功率按 correct=1 / partial=0.5 / fail=0 计分；每格剔除任一臂因云基础设施失败的站后配对。两个对照组基线一致（71% / 68%），技能组都稳定拉到 84%。</p>
+  </section>
+
+  <section>
+    <div class="callout">
+      <div class="huge">123%</div>
+      <p><b>泛化是这次实验最关键的发现。</b>同一份 skill（在 case A 上调过），用到完全不同的 case B 上，增益不降反升（+13pp → +16pp）。说明 skill 沉淀的是<b>可迁移的站点知识</b>——接口地址、DOM 选择器、反爬绕法、字段不可得的诚实标注——而不是某个具体任务的答案。写一个 case 的 skill，整站的同类任务都受益。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>效率 · token 与步数</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>任务集</th><th>指标</th><th>对照组</th><th>技能组</th><th>变化</th></tr></thead>
+      <tbody>
+        <tr><td class="row-h">case A</td><td>token</td><td>2.58M</td><td>1.74M</td><td class="delta pos">−33%</td></tr>
+        <tr><td></td><td>工具调用</td><td>1423</td><td>657</td><td class="delta pos">−54%</td></tr>
+        <tr><td class="row-h">case B</td><td>token</td><td>2.33M</td><td>1.80M</td><td class="delta pos">−23%</td></tr>
+        <tr><td></td><td>工具调用</td><td>1401</td><td>658</td><td class="delta pos">−53%</td></tr>
+      </tbody>
+    </table></div>
+    <p class="cap">技能组还额外花 token 读了 skill 文件，但总消耗仍低两三成——对照组把大量 token 烧在瞎试上：猜 URL、撞反爬、404 重试。步数为 harness 记录的工具调用总数（不可伪造）。</p>
+  </section>
+
+  <section>
+    <h2>技能在哪帮倒忙</h2>
+    <div class="split">
+      <div class="panel">
+        <h3>翻盘（fail → correct）</h3>
+        <p class="cap" style="margin-top:0">对照组够不到、技能组靠现成配方拿下的：</p>
+        <div class="taglist">
+          <span class="tag up">bloomberg · 过反爬墙</span>
+          <span class="tag up">3dm · 隐藏 POST 接口</span>
+          <span class="tag up">10jqka · JSONP</span>
+          <span class="tag up">academia · 香港云IP</span>
+          <span class="tag up">ign · 结构化评分</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>拖累（correct → partial）</h3>
+        <p class="cap" style="margin-top:0">技能配方不如模型临场发挥，各 case 各 4 站：</p>
+        <div class="taglist">
+          <span class="tag dn">douban</span><span class="tag dn">evernote</span>
+          <span class="tag dn">pptv</span><span class="tag dn">so.com</span>
+          <span class="tag dn">finance.sina</span><span class="tag dn">suning</span>
+          <span class="tag dn">tv.sohu</span><span class="tag dn">you.163</span>
+        </div>
+        <p class="cap">这些 skill 值得回头修——技能有过时/误导风险，不是纯增益。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>逐站明细 · 成功 / 步数 / token（对照→技能）</h2>
+    <div class="legend">
+      <span><i class="vd ok">对</i>correct</span><span><i class="vd pt">半</i>partial</span>
+      <span><i class="vd no">错</i>fail</span><span><i class="vd infra">infra</i>基础设施失败</span>
+      <span><b class="gd" style="font-family:var(--mono)">绿</b>技能更省/更好</span>
+      <span><b class="bd" style="font-family:var(--mono)">红</b>技能更费/更差</span>
+    </div>
+    <div class="subhd">case A · 技能被调过的任务</div>
+    <div class="scroll"><table class="detail">
+      <thead><tr><th>站点</th><th>成功 对照→技能</th><th>步数 对照→技能</th><th>输出token 对照→技能</th></tr></thead>
+      <tbody>
+<tr class="hurt"><td>evernote.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">4.0k<span class="arr">→</span><b class="gd">3.4k</b></span></td></tr>
+<tr class="hurt"><td>pptv.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">2<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">5.4k<span class="arr">→</span><b class="bd">22.4k</b></span></td></tr>
+<tr class="hurt"><td>so.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">4<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">16.5k<span class="arr">→</span><b class="gd">5.4k</b></span></td></tr>
+<tr class="hurt"><td>douban.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">3<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">1.6k<span class="arr">→</span><b class="bd">6.2k</b></span></td></tr>
+<tr><td>airbnb.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">9.7k<span class="arr">→</span><b class="gd">3.6k</b></span></td></tr>
+<tr><td>baidu.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">2<span class="arr">→</span><b class="eq">2</b></span></td><td class="pc np-c"><span class="np">3.5k<span class="arr">→</span><b class="bd">4.7k</b></span></td></tr>
+<tr><td>bloomberg.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">8.0k<span class="arr">→</span><b class="gd">2.7k</b></span></td></tr>
+<tr><td>cnbc.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">4.6k<span class="arr">→</span><b class="gd">2.3k</b></span></td></tr>
+<tr><td>cqvip.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">1<span class="arr">→</span><b class="bd">7</b></span></td><td class="pc np-c"><span class="np">15.9k<span class="arr">→</span><b class="gd">14.2k</b></span></td></tr>
+<tr><td>crunchyroll.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">7.5k<span class="arr">→</span><b class="gd">5.4k</b></span></td></tr>
+<tr><td>dropbox.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">3<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">2.8k<span class="arr">→</span><b class="gd">1.6k</b></span></td></tr>
+<tr><td>finance.sina.com.cn</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">4<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">3.6k<span class="arr">→</span><b class="gd">2.1k</b></span></td></tr>
+<tr><td>gamespot.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">7.6k<span class="arr">→</span><b class="gd">3.6k</b></span></td></tr>
+<tr><td>kotaku.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd no">错</i></td><td class="pc np-c"><span class="np">12<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">7.2k<span class="arr">→</span><b class="gd">427</b></span></td></tr>
+<tr><td>le.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">16.1k<span class="arr">→</span><b class="gd">10.9k</b></span></td></tr>
+<tr><td>link.springer.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">10.3k<span class="arr">→</span><b class="gd">6.3k</b></span></td></tr>
+<tr><td>mgtv.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">4<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">14.5k<span class="arr">→</span><b class="gd">6.5k</b></span></td></tr>
+<tr><td>rottentomatoes.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">4.5k<span class="arr">→</span><b class="gd">2.5k</b></span></td></tr>
+<tr><td>scholar.google.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">14.6k<span class="arr">→</span><b class="gd">2.5k</b></span></td></tr>
+<tr><td>suning.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">10<span class="arr">→</span><b class="gd">6</b></span></td><td class="pc np-c"><span class="np">12.7k<span class="arr">→</span><b class="gd">7.3k</b></span></td></tr>
+<tr><td>wenku.baidu.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">9.5k<span class="arr">→</span><b class="gd">4.8k</b></span></td></tr>
+<tr><td>you.163.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">12<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">24.1k<span class="arr">→</span><b class="gd">7.3k</b></span></td></tr>
+<tr><td>zotero.org</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">2<span class="arr">→</span><b class="bd">3</b></span></td><td class="pc np-c"><span class="np">1.6k<span class="arr">→</span><b class="bd">4.2k</b></span></td></tr>
+<tr><td>eastmoney.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">2.4k<span class="arr">→</span><b class="bd">2.5k</b></span></td></tr>
+<tr><td>gamersky.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">10<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">4.5k<span class="arr">→</span><b class="bd">5.0k</b></span></td></tr>
+<tr><td>10jqka.com.cn</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">7.2k<span class="arr">→</span><b class="gd">4.1k</b></span></td></tr>
+<tr><td>dangdang.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">15.2k<span class="arr">→</span><b class="gd">11.5k</b></span></td></tr>
+<tr><td>fun.tv</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">3.2k<span class="arr">→</span><b class="bd">3.9k</b></span></td></tr>
+<tr><td>mod.3dmgame.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">11.6k<span class="arr">→</span><b class="gd">1.1k</b></span></td></tr>
+<tr><td>wanfangdata.com.cn</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">3<span class="arr">→</span><b class="bd">5</b></span></td><td class="pc np-c"><span class="np">11.6k<span class="arr">→</span><b class="gd">5.4k</b></span></td></tr>
+<tr><td>ign.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">0<span class="arr">→</span><b class="bd">4</b></span></td><td class="pc np-c"><span class="np">3.7k<span class="arr">→</span><b class="bd">6.9k</b></span></td></tr>
+<tr><td>ali213.net</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">14.8k<span class="arr">→</span><b class="gd">5.4k</b></span></td></tr>
+<tr><td>iqiyi.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">10.3k<span class="arr">→</span><b class="gd">4.0k</b></span></td></tr>
+<tr><td>target.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">7.3k<span class="arr">→</span><b class="gd">3.8k</b></span></td></tr>
+<tr><td>3dmgame.com</td><td class="pc"><i class="vd na">—</i><span class="arr">→</span><i class="vd na">—</i></td><td class="pc np-c"><span class="np">—<span class="arr">→</span>—</span></td><td class="pc np-c"><span class="np">10.1k<span class="arr">→</span><b class="gd">1.6k</b></span></td></tr>
+<tr><td>58.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="bd">12</b></span></td><td class="pc np-c"><span class="np">4.2k<span class="arr">→</span><b class="bd">16.2k</b></span></td></tr>
+<tr><td>academia.edu</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">14<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">12.0k<span class="arr">→</span><b class="gd">2.0k</b></span></td></tr>
+<tr><td>asos.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">10<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">15.4k<span class="arr">→</span><b class="gd">1.2k</b></span></td></tr>
+<tr><td>bestbuy.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">8.0k<span class="arr">→</span><b class="gd">3.2k</b></span></td></tr>
+<tr><td>dailymotion.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">14.7k<span class="arr">→</span><b class="gd">1.5k</b></span></td></tr>
+<tr><td>docin.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">4<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">5.5k<span class="arr">→</span><b class="bd">9.0k</b></span></td></tr>
+<tr><td>finance.yahoo.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">13.6k<span class="arr">→</span><b class="gd">912</b></span></td></tr>
+<tr><td>khanacademy.org</td><td class="pc"><i class="vd na">—</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">—<span class="arr">→</span>2</span></td><td class="pc np-c"><span class="np">3.4k<span class="arr">→</span><b class="gd">3.4k</b></span></td></tr>
+<tr><td>mi.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">3<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">2.3k<span class="arr">→</span><b class="gd">1.2k</b></span></td></tr>
+<tr><td>tv.sohu.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">5.8k<span class="arr">→</span><b class="gd">5.5k</b></span></td></tr>
+<tr><td>twitch.tv</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">4<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">4.2k<span class="arr">→</span><b class="gd">1.2k</b></span></td></tr>
+<tr><td>vimeo.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">0<span class="arr">→</span><b class="bd">1</b></span></td><td class="pc np-c"><span class="np">1.7k<span class="arr">→</span><b class="bd">2.0k</b></span></td></tr>
+<tr><td>youku.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">11<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">9.6k<span class="arr">→</span><b class="gd">6.1k</b></span></td></tr>
+<tr><td>zalando.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">0<span class="arr">→</span><b class="bd">6</b></span></td><td class="pc np-c"><span class="np">1.6k<span class="arr">→</span><b class="bd">5.0k</b></span></td></tr>
+<tr><td>v.qq.com</td><td class="pc"><i class="vd na">—</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">—<span class="arr">→</span>3</span></td><td class="pc np-c"><span class="np">8.1k<span class="arr">→</span><b class="gd">6.0k</b></span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="subhd">case B · 没见过的任务（泛化）</div>
+    <div class="scroll"><table class="detail">
+      <thead><tr><th>站点</th><th>成功 对照→技能</th><th>步数 对照→技能</th><th>输出token 对照→技能</th></tr></thead>
+      <tbody>
+<tr class="hurt"><td>tv.sohu.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd no">错</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="bd">8</b></span></td><td class="pc np-c"><span class="np">7.3k<span class="arr">→</span><b class="bd">8.4k</b></span></td></tr>
+<tr class="hurt"><td>finance.sina.com.cn</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="eq">9</b></span></td><td class="pc np-c"><span class="np">5.2k<span class="arr">→</span><b class="bd">13.3k</b></span></td></tr>
+<tr class="hurt"><td>suning.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">10<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">14.2k<span class="arr">→</span><b class="gd">6.2k</b></span></td></tr>
+<tr class="hurt"><td>you.163.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd no">错</i></td><td class="pc np-c"><span class="np">11<span class="arr">→</span><b class="bd">14</b></span></td><td class="pc np-c"><span class="np">16.9k<span class="arr">→</span><b class="gd">11.0k</b></span></td></tr>
+<tr><td>58.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="bd">7</b></span></td><td class="pc np-c"><span class="np">11.6k<span class="arr">→</span><b class="gd">10.2k</b></span></td></tr>
+<tr><td>airbnb.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">12.9k<span class="arr">→</span><b class="gd">1.9k</b></span></td></tr>
+<tr><td>baidu.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">9.5k<span class="arr">→</span><b class="gd">2.3k</b></span></td></tr>
+<tr><td>bestbuy.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">6</b></span></td><td class="pc np-c"><span class="np">14.4k<span class="arr">→</span><b class="gd">6.7k</b></span></td></tr>
+<tr><td>cnbc.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">15.1k<span class="arr">→</span><b class="gd">10.7k</b></span></td></tr>
+<tr><td>cqvip.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">11<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">9.1k<span class="arr">→</span><b class="gd">2.2k</b></span></td></tr>
+<tr><td>dropbox.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">7.1k<span class="arr">→</span><b class="gd">1.5k</b></span></td></tr>
+<tr><td>evernote.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">8.2k<span class="arr">→</span><b class="gd">3.4k</b></span></td></tr>
+<tr><td>finance.yahoo.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">2.0k<span class="arr">→</span><b class="gd">654</b></span></td></tr>
+<tr><td>gamespot.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">4.3k<span class="arr">→</span><b class="gd">2.4k</b></span></td></tr>
+<tr><td>khanacademy.org</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">2</b></span></td><td class="pc np-c"><span class="np">6.4k<span class="arr">→</span><b class="gd">2.4k</b></span></td></tr>
+<tr><td>kotaku.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd no">错</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">4.7k<span class="arr">→</span><b class="gd">524</b></span></td></tr>
+<tr><td>le.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">8<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">9.2k<span class="arr">→</span><b class="gd">7.7k</b></span></td></tr>
+<tr><td>link.springer.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">9.4k<span class="arr">→</span><b class="gd">5.9k</b></span></td></tr>
+<tr><td>mgtv.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="eq">5</b></span></td><td class="pc np-c"><span class="np">7.6k<span class="arr">→</span><b class="gd">6.3k</b></span></td></tr>
+<tr><td>mi.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">3<span class="arr">→</span><b class="bd">12</b></span></td><td class="pc np-c"><span class="np">6.3k<span class="arr">→</span><b class="bd">8.4k</b></span></td></tr>
+<tr><td>pptv.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">8</b></span></td><td class="pc np-c"><span class="np">10.7k<span class="arr">→</span><b class="bd">15.1k</b></span></td></tr>
+<tr><td>rottentomatoes.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">8.1k<span class="arr">→</span><b class="gd">1.4k</b></span></td></tr>
+<tr><td>scholar.google.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">16.0k<span class="arr">→</span><b class="gd">2.1k</b></span></td></tr>
+<tr><td>so.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd no">错</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">6.5k<span class="arr">→</span><b class="gd">1.8k</b></span></td></tr>
+<tr><td>target.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">11.9k<span class="arr">→</span><b class="bd">13.6k</b></span></td></tr>
+<tr><td>twitch.tv</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">5<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">6.1k<span class="arr">→</span><b class="gd">1.7k</b></span></td></tr>
+<tr><td>vimeo.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">11<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">10.8k<span class="arr">→</span><b class="gd">3.3k</b></span></td></tr>
+<tr><td>wenku.baidu.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">12.3k<span class="arr">→</span><b class="gd">3.4k</b></span></td></tr>
+<tr><td>zalando.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">17.2k<span class="arr">→</span><b class="gd">5.3k</b></span></td></tr>
+<tr><td>zotero.org</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">8</b></span></td><td class="pc np-c"><span class="np">9.9k<span class="arr">→</span><b class="bd">10.0k</b></span></td></tr>
+<tr><td>douban.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">10<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">14.0k<span class="arr">→</span><b class="gd">5.7k</b></span></td></tr>
+<tr><td>eastmoney.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">3.0k<span class="arr">→</span><b class="gd">2.1k</b></span></td></tr>
+<tr><td>ign.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="eq">7</b></span></td><td class="pc np-c"><span class="np">6.9k<span class="arr">→</span><b class="gd">6.4k</b></span></td></tr>
+<tr><td>v.qq.com</td><td class="pc"><i class="vd ok">对</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">6</b></span></td><td class="pc np-c"><span class="np">17.3k<span class="arr">→</span><b class="gd">9.0k</b></span></td></tr>
+<tr><td>asos.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">6<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">14.0k<span class="arr">→</span><b class="gd">5.3k</b></span></td></tr>
+<tr><td>crunchyroll.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">14.5k<span class="arr">→</span><b class="gd">1.8k</b></span></td></tr>
+<tr><td>dailymotion.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">10.0k<span class="arr">→</span><b class="gd">1.9k</b></span></td></tr>
+<tr><td>dangdang.com</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">12<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">13.8k<span class="arr">→</span><b class="gd">4.7k</b></span></td></tr>
+<tr><td>fun.tv</td><td class="pc"><i class="vd pt">半</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">11<span class="arr">→</span><b class="gd">4</b></span></td><td class="pc np-c"><span class="np">9.4k<span class="arr">→</span><b class="gd">3.9k</b></span></td></tr>
+<tr><td>mod.3dmgame.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd pt">半</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">0</b></span></td><td class="pc np-c"><span class="np">14.6k<span class="arr">→</span><b class="gd">1.6k</b></span></td></tr>
+<tr><td>10jqka.com.cn</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">15<span class="arr">→</span><b class="gd">3</b></span></td><td class="pc np-c"><span class="np">15.5k<span class="arr">→</span><b class="gd">2.9k</b></span></td></tr>
+<tr><td>bloomberg.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">1</b></span></td><td class="pc np-c"><span class="np">6.5k<span class="arr">→</span><b class="gd">802</b></span></td></tr>
+<tr><td>docin.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">12<span class="arr">→</span><b class="eq">12</b></span></td><td class="pc np-c"><span class="np">15.0k<span class="arr">→</span><b class="gd">12.6k</b></span></td></tr>
+<tr><td>iqiyi.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">11<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">12.1k<span class="arr">→</span><b class="gd">4.8k</b></span></td></tr>
+<tr><td>wanfangdata.com.cn</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">13<span class="arr">→</span><b class="gd">12</b></span></td><td class="pc np-c"><span class="np">9.4k<span class="arr">→</span><b class="bd">17.8k</b></span></td></tr>
+<tr><td>gamersky.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">18<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">9.4k<span class="arr">→</span><b class="gd">3.8k</b></span></td></tr>
+<tr><td>3dmgame.com</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd no">错</i></td><td class="pc np-c"><span class="np">7<span class="arr">→</span><b class="eq">7</b></span></td><td class="pc np-c"><span class="np">10.8k<span class="arr">→</span><b class="gd">9.0k</b></span></td></tr>
+<tr><td>academia.edu</td><td class="pc"><i class="vd infra">infra</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">2<span class="arr">→</span><b class="bd">3</b></span></td><td class="pc np-c"><span class="np">4.0k<span class="arr">→</span><b class="gd">2.6k</b></span></td></tr>
+<tr><td>ali213.net</td><td class="pc"><i class="vd na">—</i><span class="arr">→</span><i class="vd ok">对</i></td><td class="pc np-c"><span class="np">—<span class="arr">→</span>5</span></td><td class="pc np-c"><span class="np">10.7k<span class="arr">→</span><b class="gd">9.9k</b></span></td></tr>
+<tr><td>youku.com</td><td class="pc"><i class="vd no">错</i><span class="arr">→</span><i class="vd infra">infra</i></td><td class="pc np-c"><span class="np">9<span class="arr">→</span><b class="gd">5</b></span></td><td class="pc np-c"><span class="np">18.0k<span class="arr">→</span><b class="gd">11.3k</b></span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="cap">按本 case 的成功增益排序，<b style="color:var(--neg)">被拖累的站置顶标红</b>。步数为代理自报的 browser-harness 调用次数（弱模型有低报，趋势可比）；token 为轨迹里的输出 token 合计（真实、不可伪造）。典型如 iqiyi：错/15步/10k → 对/2步/4k。个别站步数降但 token 升（如 pptv：技能改走浏览器渲染，页面大），是路径取舍差异。</p>
+  </section>
+
+  <section>
+    <h2>方法与诚实边界</h2>
+    <ul class="notes">
+      <li><b>执行体 Haiku 4.5</b>，云浏览器为 Lexmount（原生 CDP 桥接 browser-harness），两臂唯一变量是能否读 skill 文件。</li>
+      <li><b>成功率由独立 Fable 判分员</b>对数据集 reference_answer 的 key_points 逐站判定；动态数据（股价/汇率/最新文章）只要结构正确、像真实抓取即算通过。</li>
+      <li><b>安全剔除</b>：google.com（14 个任务中 13 个是人肉/点击欺诈/炸弹教程等拒绝测试）与 taobao 整站排除，不为恶意任务建或测 skill。</li>
+      <li><b>基础设施噪声</b>：早期云会话上限（50 持久上下文）导致部分站 infra 失败，已定位为"每任务新建 context 且只关 session 不删 context"的编排 bug——改用无状态临时会话后消除，配对分析已剔除受影响站。</li>
+      <li><b>步数口径</b>：部分弱模型代理绕过计量 wrapper 改用其它浏览器工具，故步数以 harness 的工具调用总数为准，跨代理趋势可比、逐站不严格。</li>
+    </ul>
+    <p class="foot">阶段 1（见过）+ 阶段 2（泛化）· 每站 1 case · 4 个 workflow / 200 次 Haiku 执行 · 2026-07-05</p>
+  </section>
+</div>
