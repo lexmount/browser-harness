@@ -1,8 +1,12 @@
 # Weather APIs — Data Extraction
 
-Three free, no-auth weather APIs tested: **wttr.in** (simplest), **Open-Meteo** (most complete), **weather.gov / NWS** (US only, official).
+<!-- verified 2026-07-06: Open-Meteo + weather.com.cn paths both live -->
+
+Four free, no-auth weather sources tested: **wttr.in** (simplest), **Open-Meteo** (most complete), **weather.gov / NWS** (US only, official), **weather.com.cn / 中国天气网** (authoritative for China cities).
 
 All work with `http_get` — no browser needed.
+
+**Chinese cities (中国天气网 weather.com.cn):** wttr.in/Open-Meteo work too but return WMO-code weather and slightly different temps. For the *authoritative CN source* use the weather.com.cn JSON endpoint — see the weather.com.cn section below.
 
 ## Do this first: pick your API
 
@@ -270,6 +274,71 @@ for p in fch['properties']['periods'][:5]:
 
 ---
 
+## weather.com.cn / 中国天气网 (authoritative for China cities)
+
+The official CN weather service. No public REST API, but the site is backed by static JSON-in-JS files on `d1.weather.com.cn` that return current + 7-day forecast. **These require a `Referer` header pointing at weather.com.cn, else HTTP 403.** No browser needed — `http_get` with headers works (verified 2026-07-06 from云香港IP; also works from大陆IP).
+
+### Step 1: city name → weather.com.cn city code
+
+Codes are 9-digit strings, e.g. Hangzhou = `101210101`, Beijing = `101010100`, Shanghai = `101020100`, Guangzhou = `101280101`, Shenzhen = `101280601`. To look one up, hit the search suggest API:
+
+```python
+import json
+# GBK-ish JSON; keys: ref = "code~name~pinyin~...~province..."
+r = http_get("http://toy1.weather.com.cn/search?cityname=" + "杭州".encode().decode())
+# Simpler: the well-known codes above cover most large cities. Hangzhou=101210101.
+```
+
+### Step 2: fetch current + 7-day forecast JSON
+
+```python
+import json, re
+CODE = "101210101"  # Hangzhou
+h = {"Referer": f"http://www.weather.com.cn/weather/{CODE}.shtml",
+     "User-Agent": "Mozilla/5.0"}
+raw = http_get(f"http://d1.weather.com.cn/weather_index/{CODE}.html?_=1", headers=h)
+# raw is JS: several `var X = {...};` blocks. Extract by brace-matching, NOT regex
+# (the objects contain nested braces & escaped slashes — a lazy regex misses the end).
+
+def js_obj(raw, varname):
+    i = raw.find(f"var {varname} =")
+    seg = raw[i:]
+    start = seg.find("{"); depth = 0
+    for j in range(start, len(seg)):
+        if seg[j] == "{": depth += 1
+        elif seg[j] == "}":
+            depth -= 1
+            if depth == 0:
+                return json.loads(seg[start:j+1])
+
+fc = js_obj(raw, "fc")     # 7-day forecast
+sk = js_obj(raw, "dataSK") # live observation (current temp/humidity/aqi)
+
+# fc['f'] is a list of day dicts. fj=日名(今天/星期二...), fi=日期(7/7),
+#   fc=最高温, fd=最低温, fa=白天天气码, fb=夜间天气码, fe/ff=风向, fg/fh=风力
+CN_WX = {"00":"晴","01":"多云","02":"阴","03":"阵雨","04":"雷阵雨","05":"雷阵雨伴冰雹",
+         "06":"雨夹雪","07":"小雨","08":"中雨","09":"大雨","10":"暴雨",
+         "13":"阵雪","14":"小雪","15":"中雪","16":"大雪","18":"雾","19":"冻雨","53":"霾"}
+for d in fc['f']:
+    print(d['fj'], d['fi'], "最高", d['fc']+"℃", "最低", d['fd']+"℃",
+          "白天", CN_WX.get(d['fa'], d['fa']), "风", d['fe'])
+# f[0]=今天, f[1]=明天, f[2]=后天 ...
+```
+
+**"明天"（tomorrow) = `fc['f'][1]`.** Read `fc`(最高) / `fd`(最低) / `fa`(白天天气码).
+
+Other useful blocks in the same response:
+- `dataSK`  — live: `temp`(实时气温), `SD`(湿度), `WD`/`WS`(风向/风力), `aqi`, `weather`(文字), `time`.
+- `cityDZ`   — today's summary: `temp`(高)/`tempn`(低)/`weather`(如"阵雨转多云").
+- `dataZS`   — 生活指数 (穿衣/紫外线/洗车…).
+
+### Alternate endpoints (same host, also need Referer)
+- `http://d1.weather.com.cn/sk_2d/{CODE}.html` → `var dataSK={...}` live obs only.
+- `http://d1.weather.com.cn/dingzhi/{CODE}.html` → `var cityDZ{CODE}={...}` today summary.
+- The human page is `http://www.weather.com.cn/weather/{CODE}.shtml` (7-day) — parse only if the JSON host is down; the `<ul class="t clearfix">` `<li>` items hold each day.
+
+---
+
 ## WMO weather code table (Open-Meteo `weathercode`)
 
 ```python
@@ -396,3 +465,11 @@ print(http_get_wttr("https://wttr.in/Berlin?format=%25l:+%25C+%25t+(feels+%25f)+
 **Open-Meteo rate limit: 10,000 requests/day on the free tier.** The geocoding API and forecast API count separately. No rate limit headers are returned — track usage yourself.
 
 **weather.gov /points response is heavily cached** (`Cache-Control: public, max-age=20500`). Store the office/gridX/gridY and reuse — only call `/points` once per location.
+
+**weather.com.cn `d1.weather.com.cn` returns HTTP 403 without a `Referer` header.** Set `Referer: http://www.weather.com.cn/weather/{CODE}.shtml`. A `Mozilla/5.0` UA alone is not enough. (verified 2026-07-06)
+
+**weather.com.cn responses are `var X = {...};` JS, not pure JSON.** Do NOT use a lazy regex like `var fc =(\{.*?\});` — the objects contain nested braces and escaped `\/`, so `.*?` stops at the first `}` and `json.loads` fails / a greedy one swallows sibling blocks. Brace-match instead (see `js_obj` helper above). (hit this 2026-07-06)
+
+**weather.com.cn `fc['f']` order is 今天/明天/后天…** so tomorrow is index `[1]`, not `[0]`. Cross-check with `cityDZ`/`dataSK` which are *today only*. The daytime weather text comes from code `fa` (map via `CN_WX`); night is `fb`.
+
+**weather.com.cn temps vs Open-Meteo differ.** e.g. Hangzhou 2026-07-07: weather.com.cn 36℃/28℃ 多云, Open-Meteo 36.7/27.5 code-3. For a CN-authoritative answer use weather.com.cn; for programmatic/global use Open-Meteo.

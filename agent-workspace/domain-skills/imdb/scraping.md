@@ -1,6 +1,6 @@
 # IMDb — Charts, Search, and "More Like This" Scraping
 
-`https://www.imdb.com` — the Internet Movie Database. Field-tested on 2026-04-24 against `chart/top`, `chart/moviemeter`, `find/?s=tt&q=`, and `title/tt{id}/` pages.
+`https://www.imdb.com` — the Internet Movie Database. Field-tested on 2026-04-24 against `chart/top`, `chart/moviemeter`, `find/?s=tt&q=`, and `title/tt{id}/` pages. (re-verified 2026-07-06: search + title JSON-LD paths work; two fixes applied — search title selector order, and `http_get` now blocked, see Gotchas.)
 
 IMDb's app shell is React with a shared design system (`ipc-*` classes). The same `li.ipc-metadata-list-summary-item` row primitive is reused across Top 250, MovieMeter, Search, and most other list pages — learn one selector set, scrape many pages.
 
@@ -16,9 +16,9 @@ The `tt`-prefixed title ID in the URL (`/title/tt0111161/`) is IMDb's stable pri
 | MovieMeter (trending top 100) | browser | `/chart/moviemeter` | 100 rows, same row structure as Top 250 |
 | Keyword/title search | browser | `/find/?s=tt&q=KEYWORD` | `s=tt` restricts to titles |
 | "More Like This" recommendations | browser | `/title/tt{id}/` | Lazy-loaded, requires scroll |
-| Title metadata (year, runtime, genres) | `http_get` + JSON-LD | `/title/tt{id}/` | The `<script type="application/ld+json">` block carries full Movie schema |
+| Title metadata (director, cast, rating, year, runtime, genres) | browser + JSON-LD | `/title/tt{id}/` | Read `script[type="application/ld+json"]` from the DOM via `js()`. `http_get` is currently blocked (0 bytes) — see Gotchas. |
 
-`http_get` works for title pages (the JSON-LD and OG meta-tag blocks are pre-rendered), but the chart, search, and "More Like This" panels are client-hydrated — use the browser for those.
+As of 2026-07-06 `http_get` on imdb.com returns 0 bytes (blocked — see Gotchas), so use the browser for **everything**: read the pre-rendered JSON-LD from the title-page DOM for metadata, and the browser for the client-hydrated chart, search, and "More Like This" panels.
 
 ---
 
@@ -134,9 +134,12 @@ def imdb_search(keyword, limit=25):
         if (!ttM || seen.has(ttM[1])) return;
         seen.add(ttM[1]);
 
-        var tEl = li.querySelector(
-          '.ipc-metadata-list-summary-item__t, .ipc-title__text, a.ipc-metadata-list-summary-item__t'
-        );
+        // NOTE (2026-07-06): on current search pages `.ipc-metadata-list-summary-item__t`
+        // is present but EMPTY; the real title lives in `.ipc-title__text`. Query all
+        // candidates and take the first NON-EMPTY one — order alone is not enough.
+        var tEl = Array.from(li.querySelectorAll(
+          '.ipc-title__text, .ipc-metadata-list-summary-item__t, a.ipc-metadata-list-summary-item__t'
+        )).find(function (el) { return el.textContent.trim(); });
         var meta = Array.from(li.querySelectorAll(
           '.ipc-metadata-list-summary-item__li, .ipc-inline-list__item'
         )).map(function (s) { return s.textContent.trim(); }).filter(Boolean);
@@ -262,7 +265,16 @@ recs = more_like_this("tt0111161")   # Shawshank -> ~12 recommendations
 
 **`s=tt` restricts to titles only.** Drop the param (or use `s=all`) and the result set mixes in people (`nm*`), companies (`co*`), keywords, and user lists. The `tt`-id dedupe still works, but the result shape changes.
 
-**`http_get` works on title pages.** If you only need year, runtime, directors, cast, and the aggregate rating, a plain `http_get(f"https://www.imdb.com/title/{tt_id}/")` gives you the `<script type="application/ld+json">` Movie block in one request — no browser needed. Use the browser only for the chart, search, and "More Like This" panels.
+**`http_get` on imdb.com is BLOCKED as of 2026-07-06 — returns 0 bytes** (retried twice, both empty; the mainland-IP path is refused by IMDb). Use the browser instead: `new_tab(f"https://www.imdb.com/title/{tt_id}/"); wait_for_load(); wait(2)`, then read the JSON-LD from the DOM:
+
+```python
+raw = js(r"""(function(){var s=document.querySelector('script[type="application/ld+json"]');return s?s.textContent:"NONE";})()""")
+d = json.loads(raw)
+# d["name"], d["director"] (list of {name}), d["actor"] (top 3, list of {name}),
+# d["aggregateRating"]["ratingValue"], d["aggregateRating"]["ratingCount"]
+```
+
+Verified 2026-07-06 on `tt15398776` (Oppenheimer): director = Christopher Nolan; actor = Cillian Murphy, Emily Blunt, Matt Damon; ratingValue = 8.2. The `actor` array is already the top-billed cast, so `d["actor"][:3]` gives the top 3 cast directly. (Historically `http_get` worked here; if it starts returning non-empty again the JSON-LD parse is identical.)
 
 ---
 

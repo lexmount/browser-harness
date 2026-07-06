@@ -1,7 +1,16 @@
 # Bilibili — Site Navigation & Structure
 
-Field-tested against bilibili.com on 2026-05-01.
+Field-tested against bilibili.com on 2026-05-01 (re-verified 2026-07-06).
 Requires login for personal-space features; public pages are accessible without auth.
+
+> **2026-07-06 anti-bot note (unauthenticated automation):** `space.bilibili.com/{UID}/*`
+> now returns HTTP **412 "触发哔哩哔哩安全风控策略"** for datacenter/cloud IPs without a
+> logged-in session — the SPA renders an error page, not the video grid. The unsigned
+> `api.bilibili.com/x/space/arc/search` also returns **`code:-799` (请求过于频繁)** and stays
+> blocked on retry. **Working fallback for reading a UP主's latest upload without login:**
+> use the **search page** `search.bilibili.com/all?keyword={NAME}` — its author "user module"
+> block lists that creator's own recent uploads newest-first (title + relative date + views),
+> readable via `js()`. See Gotchas for the exact selectors.
 
 ---
 
@@ -290,3 +299,6 @@ uid = js("document.querySelector('.header-entry-avatar')?.closest('a')?.href?.ma
 - **Coins are not B-Coins** — 硬币 (coins) are earned daily for free. B币 (B-Coins) are purchased with real money and used for tipping/charging/premium.
 - **Some channel URL slugs use abbreviations** — 鬼畜 is `/c/kichiku`, 娱乐 is `/c/ent`, 科技 is `/c/tech`. Not all are pinyin or translated.
 - **`wait_for_load()` is not enough on video pages** — like YouTube, the video player and its toolbar components hydrate after the load event. Add a `wait(3)` before querying video toolbar selectors.
+- **`space.bilibili.com/{UID}/*` is 412-blocked for unauthenticated automation (2026-07-06)** — cloud/datacenter IPs hit bilibili's security risk-control and get an error page (`document.title` becomes `出错啦!`, body says `错误号: 412 ... 触发哔哩哔哩安全风控策略`). The `/upload` and `/video` sub-paths both fail; the SPA reports `readyState: complete` but the video list never renders (`a[href*="BV"]` count is 0). Only real logged-in browser sessions reliably load personal-space video grids.
+- **Unsigned space video API is rate-limited to death** — `api.bilibili.com/x/space/arc/search?mid={UID}&order=pubdate` returns `{"code":-799,"message":"请求过于频繁"}` even on the first request from a datacenter IP, and does not recover on retry. The signed WBI endpoint (`/x/space/wbi/arc/search`) needs `w_rid`+`wts` signing from a cookie'd session.
+- **To read a UP主's latest upload without login, use SEARCH, not the space page** — load `search.bilibili.com/all?keyword={NAME}` (this page renders fine on cloud IPs). The creator's own recent uploads live in the author "user module" and are listed newest-first. Extraction that works: iterate `.bili-video-card`, read title from `.bili-video-card__info--tit`, uploader from `.bili-video-card__info--author`, and relative date from `.bili-video-card__info--date`. The author's own cards carry `up === "{NAME}"`; the first such card (or the first entry in the user-module block, which is chronological, e.g. `06-18 > 06-06 > 05-30`) is the latest video. Note the plain `/video?...&order=pubdate` search tab returns *reuploads by other users*, not the creator's own — filter by uploader name.

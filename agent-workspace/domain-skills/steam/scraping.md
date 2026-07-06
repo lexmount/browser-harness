@@ -1,6 +1,6 @@
 # Steam — Scraping & Data Extraction
 
-Field-tested against store.steampowered.com on 2026-04-18. All code blocks validated with live requests.
+Field-tested against store.steampowered.com on 2026-04-18. All code blocks validated with live requests. (re-verified 2026-07-06)
 
 ## Fastest approach: App Details API (no auth, no browser)
 
