@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 bbs.hupu.com is a fully server-rendered forum: the NBA thread list (`/nba` = 篮球场) and every thread's replies are in the raw HTML, so you can scrape the whole task with plain HTTP + regex — no browser render, no JSON API, no login.
 
 ## Do this first (fastest path: local http_get + regex)

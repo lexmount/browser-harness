@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 airbnb.cn (爱彼迎) — capture destination search autocomplete/联想 suggestions via a public no-login JSON endpoint.
 
 ## Do this first (BEST path): hit the autocomplete JSON API directly

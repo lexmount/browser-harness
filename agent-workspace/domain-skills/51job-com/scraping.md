@@ -1,6 +1,6 @@
 # 51job.com (前程无忧) scraping
 
-Field-tested on 2026-07-04 (re-run 2026-07-06). Job search on 51job: the results list lives in a Vue SPA at `we.51job.com/pc/search`; extract each posting from the `sensorsdata` JSON attribute on the card. Detail pages and the raw JSON API are both anti-bot walled — do everything from the search results list.
+Field-tested on 2026-07-04 (re-run 2026-07-06) (re-verified 2026-07-06). Job search on 51job: the results list lives in a Vue SPA at `we.51job.com/pc/search`; extract each posting from the `sensorsdata` JSON attribute on the card. Detail pages and the raw JSON API are both anti-bot walled — do everything from the search results list.
 
 ## Do this first (the only reliable path)
 

@@ -1,6 +1,6 @@
 # caixin.com scraping
 
-Field-tested on 2026-07-04 (cloud Chrome, HK exit IP). Caixin 财新网 站内搜索：结果页服务端渲染出标题/作者/日期/频道，用 js() 直接抓 DOM 即可；无免签名的公开 JSON 接口。
+Field-tested on 2026-07-04 (cloud Chrome, HK exit IP) (re-verified 2026-07-06). Caixin 财新网 站内搜索：结果页服务端渲染出标题/作者/日期/频道，用 js() 直接抓 DOM 即可；无免签名的公开 JSON 接口。
 
 ## Do this first (最优路径)
 

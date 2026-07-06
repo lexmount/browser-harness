@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 
 Bank of China (boc.cn) foreign-exchange rate board (外汇牌价): a single static HTML table at one fixed URL lists ~29 currencies with all five bank rates. No login, no JSON API needed, no anti-bot.
 

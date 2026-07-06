@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04 — finance.ifeng.com (凤凰网财经): grab the channel top headline + open any article, extracting title / publish-time / source from an embedded JSON blob. **Both the homepage and article pages are servable via plain `http_get` from the local (China) IP — no cloud browser, no login, no reverse-proxy needed.**
+Field-tested on 2026-07-04 (re-verified 2026-07-06) — finance.ifeng.com (凤凰网财经): grab the channel top headline + open any article, extracting title / publish-time / source from an embedded JSON blob. **Both the homepage and article pages are servable via plain `http_get` from the local (China) IP — no cloud browser, no login, no reverse-proxy needed.**
 
 ## Do this first (offline path — fastest, verified)
 

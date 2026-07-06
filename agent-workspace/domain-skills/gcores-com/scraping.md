@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 
 gcores.com (机核 GCORES) is an Ember SPA backed by a public, no-auth JSON:API at `https://www.gcores.com/gapi/v1/`. Skip the browser search UI entirely — hit the API.
 

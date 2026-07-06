@@ -1,4 +1,4 @@
-Field-tested on 2026-07-04
+Field-tested on 2026-07-04 (re-verified 2026-07-06)
 观察者网 (guancha.cn) — 站内搜索 + 按时间排序 + 文章正文提取。适用任务：搜某主题、按时间看最近文章、总结近期热议话题。
 
 ## Do this first（最优路径：云浏览器打开 search.htm → 点"按时间排序" → DOM 提取）

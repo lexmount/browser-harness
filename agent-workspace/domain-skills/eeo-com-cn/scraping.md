@@ -1,6 +1,6 @@
 # eeo.com.cn (经济观察网) — scraping
 
-Field-tested on 2026-07-04. Search 经济观察网 for a keyword, list results (title/time/url) newest-first, then read an article's title/publish-time/source.
+Field-tested on 2026-07-04 (re-verified 2026-07-06). Search 经济观察网 for a keyword, list results (title/time/url) newest-first, then read an article's title/publish-time/source.
 
 ## Do this first (fastest, no browser needed)
 
