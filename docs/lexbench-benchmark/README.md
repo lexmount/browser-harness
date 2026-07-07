@@ -27,16 +27,20 @@ failed for infrastructure reasons.
 ## Files
 
 - `report.html` — full visual report (open in a browser), incl. per-site 3-metric detail.
-- `per-site-results.json` — machine-readable per-site verdicts, self-reported steps, and
-  total-token consumption for all four arms (ctrl/skill × case A/B).
+- `per-site-results.json` — machine-readable per-site verdicts, agent trajectory steps
+  (`aA`/`aB`, all tool calls counted from transcripts), self-reported browser-harness call
+  counts (`sA`/`sB`), and total-token consumption for all four arms (ctrl/skill × case A/B).
 - `arm-token-totals.json` — arm-level token totals with per-category breakdown
   (input / cache_creation / cache_read / output).
 
 ## Honest caveats
 
-- **Steps** are agent self-reported browser-harness call counts — weak models under-report
-  or bypass the wrapper, so treat step counts as directional, not exact. **Tokens** (pulled
-  from agent transcripts) are the trustworthy effort metric.
+- **Two step metrics**: *agent trajectory steps* are all tool calls counted from the
+  transcript (trustworthy); *browser calls* are agent self-reported browser-harness
+  invocations — weak models under-report or bypass the wrapper, so treat those as
+  directional, not exact (0 = the skill documented a browser-free path or a dead end,
+  or the cloud session never came up). **Tokens** (pulled from agent transcripts) are
+  the trustworthy effort metric.
 - **Token accounting**: totals cover the full consumption of each executor run — input +
   cache_creation + cache_read + output — summed per API call after deduplicating transcript
   events by API message id. An earlier revision of this report quoted output tokens only
