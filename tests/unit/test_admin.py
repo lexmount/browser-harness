@@ -727,3 +727,33 @@ def test_run_update_pypi_mode_reports_missing_uv(monkeypatch, capsys):
 
     assert admin.run_update(yes=True) == 1
     assert "uv" in capsys.readouterr().err
+
+
+def test_run_update_git_mode_reports_missing_git(monkeypatch, capsys, tmp_path):
+    import subprocess
+
+    monkeypatch.setattr(admin, "check_for_update", lambda: ("1.0", "2.0", True))
+    monkeypatch.setattr(admin, "_install_mode", lambda: "git")
+    monkeypatch.setattr(admin, "_repo_dir", lambda: tmp_path)
+
+    def missing_git(cmd, *args, **kwargs):
+        raise FileNotFoundError(2, "No such file or directory", cmd[0])
+
+    monkeypatch.setattr(subprocess, "run", missing_git)
+
+    assert admin.run_update(yes=True) == 1
+    assert "git" in capsys.readouterr().err
+
+
+def test_ensure_daemon_survives_probe_socket_close_failure(monkeypatch):
+    """socket.close() can raise OSError (e.g. EBADF); that must not clobber the
+    healthy-daemon return or escape to callers."""
+    class ExplodingCloseSocket(FakeSocket):
+        def close(self):
+            raise OSError("bad fd")
+
+    monkeypatch.setattr(admin, "daemon_alive", lambda name=None: True)
+    monkeypatch.setattr(admin.ipc, "connect", lambda name, timeout: (ExplodingCloseSocket(), "token"))
+    monkeypatch.setattr(admin.ipc, "request", lambda s, token, payload: {"result": {}})
+
+    admin.ensure_daemon()
