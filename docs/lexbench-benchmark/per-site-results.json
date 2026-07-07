@@ -1,1 +1,2337 @@
-[{"host": "10jqka.com.cn", "vA": [["partial", false], ["correct", false]], "vB": [["fail", false], ["correct", false]], "sA": [13, 1], "sB": [15, 3], "tA": [588623, 160422], "tB": [1437414, 244899], "aA": [21, 6], "aB": [42, 9]}, {"host": "3dmgame.com", "vA": [null, null], "vB": [["fail", true], ["fail", false]], "sA": [null, null], "sB": [7, 7], "tA": [2896874, 121330], "tB": [1607819, 933604], "aA": [54, 5], "aB": [37, 26]}, {"host": "58.com", "vA": [["fail", true], ["correct", false]], "vB": [["partial", false], ["partial", false]], "sA": [5, 12], "sB": [5, 7], "tA": [451495, 1594004], "tB": [675687, 829186], "aA": [18, 43], "aB": [21, 22]}, {"host": "academia.edu", "vA": [["fail", false], ["fail", true]], "vB": [["fail", true], ["correct", false]], "sA": [14, 0], "sB": [2, 3], "tA": [1384362, 229652], "tB": [383669, 206365], "aA": [42, 9], "aB": [15, 8]}, {"host": "airbnb.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [7, 2], "sB": [13, 2], "tA": [1010534, 291083], "tB": [811195, 148336], "aA": [31, 11], "aB": [25, 6]}, {"host": "ali213.net", "vA": [["fail", false], ["correct", false]], "vB": [null, ["correct", false]], "sA": [6, 0], "sB": [null, 5], "tA": [876606, 245963], "tB": [988968, 797590], "aA": [27, 9], "aB": [26, 22]}, {"host": "asos.com", "vA": [["correct", false], ["fail", true]], "vB": [["partial", false], ["correct", false]], "sA": [10, 0], "sB": [6, 5], "tA": [1171741, 171404], "tB": [1413557, 552154], "aA": [35, 7], "aB": [39, 15]}, {"host": "baidu.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [2, 2], "sB": [6, 4], "tA": [1018439, 721601], "tB": [854543, 192827], "aA": [25, 23], "aB": [25, 7]}, {"host": "bestbuy.com", "vA": [["partial", false], ["fail", true]], "vB": [["correct", false], ["correct", false]], "sA": [15, 0], "sB": [9, 6], "tA": [536216, 386253], "tB": [1353426, 410244], "aA": [19, 14], "aB": [40, 14]}, {"host": "bloomberg.com", "vA": [["correct", false], ["correct", false]], "vB": [["fail", false], ["correct", false]], "sA": [8, 1], "sB": [13, 1], "tA": [667105, 285060], "tB": [619362, 119127], "aA": [23, 11], "aB": [22, 5]}, {"host": "cnbc.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [5, 2], "sB": [13, 4], "tA": [294087, 123180], "tB": [1520985, 559440], "aA": [12, 5], "aB": [42, 17]}, {"host": "cqvip.com", "vA": [["partial", false], ["partial", false]], "vB": [["correct", false], ["correct", false]], "sA": [1, 7], "sB": [11, 1], "tA": [1499675, 1059572], "tB": [1194336, 125269], "aA": [35, 32], "aB": [32, 5]}, {"host": "crunchyroll.com", "vA": [["correct", false], ["correct", false]], "vB": [["partial", false], ["correct", false]], "sA": [5, 2], "sB": [13, 1], "tA": [786761, 524228], "tB": [1379540, 121798], "aA": [24, 17], "aB": [38, 5]}, {"host": "dailymotion.com", "vA": [["correct", false], ["fail", true]], "vB": [["partial", false], ["correct", false]], "sA": [8, 0], "sB": [9, 1], "tA": [1132317, 198302], "tB": [860471, 146138], "aA": [32, 8], "aB": [27, 6]}, {"host": "dangdang.com", "vA": [["partial", false], ["correct", false]], "vB": [["partial", false], ["correct", false]], "sA": [7, 1], "sB": [12, 4], "tA": [2782879, 754758], "tB": [1285259, 305995], "aA": [55, 23], "aB": [37, 10]}, {"host": "docin.com", "vA": [["partial", false], ["fail", true]], "vB": [["fail", false], ["correct", false]], "sA": [4, 1], "sB": [12, 12], "tA": [1659886, 1789627], "tB": [1343459, 770580], "aA": [29, 40], "aB": [36, 22]}, {"host": "dropbox.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [3, 1], "sB": [8, 2], "tA": [169413, 174860], "tB": [803315, 149761], "aA": [7, 7], "aB": [27, 6]}, {"host": "evernote.com", "vA": [["correct", false], ["partial", false]], "vB": [["correct", false], ["correct", false]], "sA": [8, 2], "sB": [7, 3], "tA": [395691, 154855], "tB": [615813, 215654], "aA": [15, 6], "aB": [20, 8]}, {"host": "finance.sina.com.cn", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["partial", false]], "sA": [4, 0], "sB": [9, 9], "tA": [812059, 123865], "tB": [545458, 1258587], "aA": [23, 5], "aB": [18, 32]}, {"host": "finance.yahoo.com", "vA": [["correct", false], ["fail", true]], "vB": [["correct", false], ["correct", false]], "sA": [7, 0], "sB": [5, 1], "tA": [1025377, 69064], "tB": [219594, 119499], "aA": [32, 3], "aB": [9, 5]}, {"host": "fun.tv", "vA": [["fail", false], ["partial", false]], "vB": [["partial", false], ["correct", false]], "sA": [15, 4], "sB": [11, 4], "tA": [653119, 552194], "tB": [1043326, 240710], "aA": [20, 19], "aB": [32, 9]}, {"host": "gamespot.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [8, 1], "sB": [5, 2], "tA": [708103, 341997], "tB": [400549, 147364], "aA": [24, 13], "aB": [15, 6]}, {"host": "iqiyi.com", "vA": [["fail", false], ["correct", false]], "vB": [["fail", false], ["correct", false]], "sA": [15, 2], "sB": [11, 5], "tA": [1086995, 185828], "tB": [809122, 269809], "aA": [36, 7], "aB": [25, 10]}, {"host": "khanacademy.org", "vA": [null, ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [null, 2], "sB": [6, 2], "tA": [348987, 342585], "tB": [433234, 147856], "aA": [12, 13], "aB": [16, 6]}, {"host": "kotaku.com", "vA": [["fail", false], ["fail", false]], "vB": [["fail", false], ["fail", false]], "sA": [12, 0], "sB": [6, 0], "tA": [812130, 43102], "tB": [435423, 43239], "aA": [28, 2], "aB": [17, 2]}, {"host": "le.com", "vA": [["partial", false], ["partial", false]], "vB": [["correct", false], ["correct", false]], "sA": [7, 0], "sB": [8, 5], "tA": [2608132, 625842], "tB": [692614, 412744], "aA": [55, 20], "aB": [23, 14]}, {"host": "link.springer.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [8, 1], "sB": [7, 4], "tA": [766847, 384063], "tB": [799666, 323156], "aA": [25, 13], "aB": [25, 11]}, {"host": "mgtv.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [4, 3], "sB": [5, 5], "tA": [2097067, 383801], "tB": [575744, 585411], "aA": [44, 13], "aB": [20, 18]}, {"host": "mi.com", "vA": [["fail", true], ["fail", true]], "vB": [["correct", false], ["correct", false]], "sA": [3, 0], "sB": [3, 12], "tA": [476828, 259341], "tB": [2341788, 506126], "aA": [15, 10], "aB": [42, 16]}, {"host": "mod.3dmgame.com", "vA": [["partial", false], ["correct", false]], "vB": [["fail", false], ["partial", false]], "sA": [6, 1], "sB": [15, 0], "tA": [3172386, 97688], "tB": [1230570, 94148], "aA": [59, 4], "aB": [35, 4]}, {"host": "pptv.com", "vA": [["correct", false], ["partial", false]], "vB": [["partial", false], ["partial", false]], "sA": [2, 0], "sB": [13, 8], "tA": [1780511, 966064], "tB": [1212726, 875289], "aA": [32, 23], "aB": [30, 22]}, {"host": "rottentomatoes.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [6, 1], "sB": [7, 1], "tA": [333610, 151916], "tB": [785329, 121046], "aA": [13, 6], "aB": [26, 5]}, {"host": "scholar.google.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [15, 1], "sB": [9, 1], "tA": [895642, 151643], "tB": [1541007, 123044], "aA": [27, 6], "aB": [42, 5]}, {"host": "so.com", "vA": [["correct", false], ["partial", false]], "vB": [["fail", false], ["fail", false]], "sA": [4, 3], "sB": [7, 3], "tA": [637059, 336605], "tB": [686989, 150002], "aA": [21, 12], "aB": [20, 6]}, {"host": "suning.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["partial", false]], "sA": [10, 6], "sB": [10, 1], "tA": [1007047, 610298], "tB": [906931, 351484], "aA": [32, 20], "aB": [27, 9]}, {"host": "target.com", "vA": [["fail", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [7, 2], "sB": [7, 5], "tA": [1902545, 344240], "tB": [842708, 935627], "aA": [34, 12], "aB": [26, 27]}, {"host": "tv.sohu.com", "vA": [["fail", true], ["partial", false]], "vB": [["correct", false], ["fail", false]], "sA": [5, 2], "sB": [6, 8], "tA": [1092514, 464917], "tB": [921473, 831094], "aA": [32, 16], "aB": [26, 24]}, {"host": "twitch.tv", "vA": [["fail", true], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [4, 1], "sB": [5, 3], "tA": [696452, 121202], "tB": [446264, 201636], "aA": [23, 5], "aB": [16, 8]}, {"host": "vimeo.com", "vA": [["fail", true], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [0, 1], "sB": [11, 3], "tA": [274671, 123781], "tB": [1300067, 236881], "aA": [11, 5], "aB": [36, 9]}, {"host": "wanfangdata.com.cn", "vA": [["fail", false], ["partial", false]], "vB": [["fail", false], ["correct", false]], "sA": [3, 5], "sB": [13, 12], "tA": [2106606, 500835], "tB": [843855, 1273295], "aA": [46, 17], "aB": [29, 33]}, {"host": "wenku.baidu.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [9, 2], "sB": [15, 1], "tA": [1414305, 250472], "tB": [612762, 181224], "aA": [39, 9], "aB": [20, 7]}, {"host": "you.163.com", "vA": [["correct", false], ["correct", false]], "vB": [["partial", false], ["fail", false]], "sA": [12, 5], "sB": [11, 14], "tA": [3117035, 531960], "tB": [1578590, 692958], "aA": [73, 18], "aB": [37, 21]}, {"host": "youku.com", "vA": [["fail", true], ["partial", false]], "vB": [["fail", false], ["fail", true]], "sA": [11, 2], "sB": [9, 5], "tA": [839176, 258279], "tB": [1147700, 1114082], "aA": [24, 9], "aB": [33, 32]}, {"host": "zalando.com", "vA": [["fail", true], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [0, 6], "sB": [9, 5], "tA": [214691, 296189], "tB": [1247990, 269149], "aA": [9, 10], "aB": [35, 10]}, {"host": "zotero.org", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [2, 3], "sB": [9, 8], "tA": [343107, 302405], "tB": [1078836, 920683], "aA": [12, 11], "aB": [34, 27]}, {"host": "douban.com", "vA": [["correct", false], ["partial", false]], "vB": [["correct", false], ["correct", false]], "sA": [3, 0], "sB": [10, 4], "tA": [321918, 708089], "tB": [1033865, 432562], "aA": [11, 21], "aB": [33, 15]}, {"host": "eastmoney.com", "vA": [["correct", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [5, 1], "sB": [6, 3], "tA": [240723, 146921], "tB": [364176, 169194], "aA": [10, 6], "aB": [14, 7]}, {"host": "gamersky.com", "vA": [["correct", false], ["correct", false]], "vB": [["fail", false], ["correct", false]], "sA": [10, 1], "sB": [18, 5], "tA": [750442, 289273], "tB": [822915, 253595], "aA": [24, 10], "aB": [23, 9]}, {"host": "ign.com", "vA": [["partial", false], ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [0, 4], "sB": [7, 7], "tA": [794574, 595948], "tB": [553637, 549842], "aA": [27, 20], "aB": [20, 20]}, {"host": "v.qq.com", "vA": [null, ["correct", false]], "vB": [["correct", false], ["correct", false]], "sA": [null, 3], "sB": [15, 6], "tA": [3411649, 717577], "tB": [1943848, 552171], "aA": [46, 23], "aB": [46, 16]}]
+[
+ {
+  "host": "10jqka.com.cn",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   13,
+   1
+  ],
+  "sB": [
+   15,
+   3
+  ],
+  "tA": [
+   588623,
+   160422
+  ],
+  "tB": [
+   1437414,
+   244899
+  ],
+  "gA": [
+   21,
+   6
+  ],
+  "gB": [
+   42,
+   9
+  ]
+ },
+ {
+  "host": "3dmgame.com",
+  "vA": [
+   null,
+   null
+  ],
+  "vB": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "fail",
+    false
+   ]
+  ],
+  "sA": [
+   null,
+   null
+  ],
+  "sB": [
+   7,
+   7
+  ],
+  "tA": [
+   2896874,
+   121330
+  ],
+  "tB": [
+   1607819,
+   933604
+  ],
+  "gA": [
+   54,
+   5
+  ],
+  "gB": [
+   37,
+   26
+  ]
+ },
+ {
+  "host": "58.com",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "sA": [
+   5,
+   12
+  ],
+  "sB": [
+   5,
+   7
+  ],
+  "tA": [
+   451495,
+   1594004
+  ],
+  "tB": [
+   675687,
+   829186
+  ],
+  "gA": [
+   18,
+   43
+  ],
+  "gB": [
+   21,
+   22
+  ]
+ },
+ {
+  "host": "academia.edu",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   14,
+   0
+  ],
+  "sB": [
+   2,
+   3
+  ],
+  "tA": [
+   1384362,
+   229652
+  ],
+  "tB": [
+   383669,
+   206365
+  ],
+  "gA": [
+   42,
+   9
+  ],
+  "gB": [
+   15,
+   8
+  ]
+ },
+ {
+  "host": "airbnb.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   7,
+   2
+  ],
+  "sB": [
+   13,
+   2
+  ],
+  "tA": [
+   1010534,
+   291083
+  ],
+  "tB": [
+   811195,
+   148336
+  ],
+  "gA": [
+   31,
+   11
+  ],
+  "gB": [
+   25,
+   6
+  ]
+ },
+ {
+  "host": "ali213.net",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   null,
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   6,
+   0
+  ],
+  "sB": [
+   null,
+   5
+  ],
+  "tA": [
+   876606,
+   245963
+  ],
+  "tB": [
+   988968,
+   797590
+  ],
+  "gA": [
+   27,
+   9
+  ],
+  "gB": [
+   26,
+   22
+  ]
+ },
+ {
+  "host": "asos.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   10,
+   0
+  ],
+  "sB": [
+   6,
+   5
+  ],
+  "tA": [
+   1171741,
+   171404
+  ],
+  "tB": [
+   1413557,
+   552154
+  ],
+  "gA": [
+   35,
+   7
+  ],
+  "gB": [
+   39,
+   15
+  ]
+ },
+ {
+  "host": "baidu.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   2,
+   2
+  ],
+  "sB": [
+   6,
+   4
+  ],
+  "tA": [
+   1018439,
+   721601
+  ],
+  "tB": [
+   854543,
+   192827
+  ],
+  "gA": [
+   25,
+   23
+  ],
+  "gB": [
+   25,
+   7
+  ]
+ },
+ {
+  "host": "bestbuy.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   15,
+   0
+  ],
+  "sB": [
+   9,
+   6
+  ],
+  "tA": [
+   536216,
+   386253
+  ],
+  "tB": [
+   1353426,
+   410244
+  ],
+  "gA": [
+   19,
+   14
+  ],
+  "gB": [
+   40,
+   14
+  ]
+ },
+ {
+  "host": "bloomberg.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   8,
+   1
+  ],
+  "sB": [
+   13,
+   1
+  ],
+  "tA": [
+   667105,
+   285060
+  ],
+  "tB": [
+   619362,
+   119127
+  ],
+  "gA": [
+   23,
+   11
+  ],
+  "gB": [
+   22,
+   5
+  ]
+ },
+ {
+  "host": "cnbc.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   5,
+   2
+  ],
+  "sB": [
+   13,
+   4
+  ],
+  "tA": [
+   294087,
+   123180
+  ],
+  "tB": [
+   1520985,
+   559440
+  ],
+  "gA": [
+   12,
+   5
+  ],
+  "gB": [
+   42,
+   17
+  ]
+ },
+ {
+  "host": "cqvip.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   1,
+   7
+  ],
+  "sB": [
+   11,
+   1
+  ],
+  "tA": [
+   1499675,
+   1059572
+  ],
+  "tB": [
+   1194336,
+   125269
+  ],
+  "gA": [
+   35,
+   32
+  ],
+  "gB": [
+   32,
+   5
+  ]
+ },
+ {
+  "host": "crunchyroll.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   5,
+   2
+  ],
+  "sB": [
+   13,
+   1
+  ],
+  "tA": [
+   786761,
+   524228
+  ],
+  "tB": [
+   1379540,
+   121798
+  ],
+  "gA": [
+   24,
+   17
+  ],
+  "gB": [
+   38,
+   5
+  ]
+ },
+ {
+  "host": "dailymotion.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   8,
+   0
+  ],
+  "sB": [
+   9,
+   1
+  ],
+  "tA": [
+   1132317,
+   198302
+  ],
+  "tB": [
+   860471,
+   146138
+  ],
+  "gA": [
+   32,
+   8
+  ],
+  "gB": [
+   27,
+   6
+  ]
+ },
+ {
+  "host": "dangdang.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   7,
+   1
+  ],
+  "sB": [
+   12,
+   4
+  ],
+  "tA": [
+   2782879,
+   754758
+  ],
+  "tB": [
+   1285259,
+   305995
+  ],
+  "gA": [
+   55,
+   23
+  ],
+  "gB": [
+   37,
+   10
+  ]
+ },
+ {
+  "host": "docin.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   4,
+   1
+  ],
+  "sB": [
+   12,
+   12
+  ],
+  "tA": [
+   1659886,
+   1789627
+  ],
+  "tB": [
+   1343459,
+   770580
+  ],
+  "gA": [
+   29,
+   40
+  ],
+  "gB": [
+   36,
+   22
+  ]
+ },
+ {
+  "host": "dropbox.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   3,
+   1
+  ],
+  "sB": [
+   8,
+   2
+  ],
+  "tA": [
+   169413,
+   174860
+  ],
+  "tB": [
+   803315,
+   149761
+  ],
+  "gA": [
+   7,
+   7
+  ],
+  "gB": [
+   27,
+   6
+  ]
+ },
+ {
+  "host": "evernote.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   8,
+   2
+  ],
+  "sB": [
+   7,
+   3
+  ],
+  "tA": [
+   395691,
+   154855
+  ],
+  "tB": [
+   615813,
+   215654
+  ],
+  "gA": [
+   15,
+   6
+  ],
+  "gB": [
+   20,
+   8
+  ]
+ },
+ {
+  "host": "finance.sina.com.cn",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "sA": [
+   4,
+   0
+  ],
+  "sB": [
+   9,
+   9
+  ],
+  "tA": [
+   812059,
+   123865
+  ],
+  "tB": [
+   545458,
+   1258587
+  ],
+  "gA": [
+   23,
+   5
+  ],
+  "gB": [
+   18,
+   32
+  ]
+ },
+ {
+  "host": "finance.yahoo.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   7,
+   0
+  ],
+  "sB": [
+   5,
+   1
+  ],
+  "tA": [
+   1025377,
+   69064
+  ],
+  "tB": [
+   219594,
+   119499
+  ],
+  "gA": [
+   32,
+   3
+  ],
+  "gB": [
+   9,
+   5
+  ]
+ },
+ {
+  "host": "fun.tv",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   15,
+   4
+  ],
+  "sB": [
+   11,
+   4
+  ],
+  "tA": [
+   653119,
+   552194
+  ],
+  "tB": [
+   1043326,
+   240710
+  ],
+  "gA": [
+   20,
+   19
+  ],
+  "gB": [
+   32,
+   9
+  ]
+ },
+ {
+  "host": "gamespot.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   8,
+   1
+  ],
+  "sB": [
+   5,
+   2
+  ],
+  "tA": [
+   708103,
+   341997
+  ],
+  "tB": [
+   400549,
+   147364
+  ],
+  "gA": [
+   24,
+   13
+  ],
+  "gB": [
+   15,
+   6
+  ]
+ },
+ {
+  "host": "iqiyi.com",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   15,
+   2
+  ],
+  "sB": [
+   11,
+   5
+  ],
+  "tA": [
+   1086995,
+   185828
+  ],
+  "tB": [
+   809122,
+   269809
+  ],
+  "gA": [
+   36,
+   7
+  ],
+  "gB": [
+   25,
+   10
+  ]
+ },
+ {
+  "host": "khanacademy.org",
+  "vA": [
+   null,
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   null,
+   2
+  ],
+  "sB": [
+   6,
+   2
+  ],
+  "tA": [
+   348987,
+   342585
+  ],
+  "tB": [
+   433234,
+   147856
+  ],
+  "gA": [
+   12,
+   13
+  ],
+  "gB": [
+   16,
+   6
+  ]
+ },
+ {
+  "host": "kotaku.com",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "fail",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "fail",
+    false
+   ]
+  ],
+  "sA": [
+   12,
+   0
+  ],
+  "sB": [
+   6,
+   0
+  ],
+  "tA": [
+   812130,
+   43102
+  ],
+  "tB": [
+   435423,
+   43239
+  ],
+  "gA": [
+   28,
+   2
+  ],
+  "gB": [
+   17,
+   2
+  ]
+ },
+ {
+  "host": "le.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   7,
+   0
+  ],
+  "sB": [
+   8,
+   5
+  ],
+  "tA": [
+   2608132,
+   625842
+  ],
+  "tB": [
+   692614,
+   412744
+  ],
+  "gA": [
+   55,
+   20
+  ],
+  "gB": [
+   23,
+   14
+  ]
+ },
+ {
+  "host": "link.springer.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   8,
+   1
+  ],
+  "sB": [
+   7,
+   4
+  ],
+  "tA": [
+   766847,
+   384063
+  ],
+  "tB": [
+   799666,
+   323156
+  ],
+  "gA": [
+   25,
+   13
+  ],
+  "gB": [
+   25,
+   11
+  ]
+ },
+ {
+  "host": "mgtv.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   4,
+   3
+  ],
+  "sB": [
+   5,
+   5
+  ],
+  "tA": [
+   2097067,
+   383801
+  ],
+  "tB": [
+   575744,
+   585411
+  ],
+  "gA": [
+   44,
+   13
+  ],
+  "gB": [
+   20,
+   18
+  ]
+ },
+ {
+  "host": "mi.com",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   3,
+   0
+  ],
+  "sB": [
+   3,
+   12
+  ],
+  "tA": [
+   476828,
+   259341
+  ],
+  "tB": [
+   2341788,
+   506126
+  ],
+  "gA": [
+   15,
+   10
+  ],
+  "gB": [
+   42,
+   16
+  ]
+ },
+ {
+  "host": "mod.3dmgame.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "sA": [
+   6,
+   1
+  ],
+  "sB": [
+   15,
+   0
+  ],
+  "tA": [
+   3172386,
+   97688
+  ],
+  "tB": [
+   1230570,
+   94148
+  ],
+  "gA": [
+   59,
+   4
+  ],
+  "gB": [
+   35,
+   4
+  ]
+ },
+ {
+  "host": "pptv.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "sA": [
+   2,
+   0
+  ],
+  "sB": [
+   13,
+   8
+  ],
+  "tA": [
+   1780511,
+   966064
+  ],
+  "tB": [
+   1212726,
+   875289
+  ],
+  "gA": [
+   32,
+   23
+  ],
+  "gB": [
+   30,
+   22
+  ]
+ },
+ {
+  "host": "rottentomatoes.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   6,
+   1
+  ],
+  "sB": [
+   7,
+   1
+  ],
+  "tA": [
+   333610,
+   151916
+  ],
+  "tB": [
+   785329,
+   121046
+  ],
+  "gA": [
+   13,
+   6
+  ],
+  "gB": [
+   26,
+   5
+  ]
+ },
+ {
+  "host": "scholar.google.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   15,
+   1
+  ],
+  "sB": [
+   9,
+   1
+  ],
+  "tA": [
+   895642,
+   151643
+  ],
+  "tB": [
+   1541007,
+   123044
+  ],
+  "gA": [
+   27,
+   6
+  ],
+  "gB": [
+   42,
+   5
+  ]
+ },
+ {
+  "host": "so.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "fail",
+    false
+   ]
+  ],
+  "sA": [
+   4,
+   3
+  ],
+  "sB": [
+   7,
+   3
+  ],
+  "tA": [
+   637059,
+   336605
+  ],
+  "tB": [
+   686989,
+   150002
+  ],
+  "gA": [
+   21,
+   12
+  ],
+  "gB": [
+   20,
+   6
+  ]
+ },
+ {
+  "host": "suning.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "sA": [
+   10,
+   6
+  ],
+  "sB": [
+   10,
+   1
+  ],
+  "tA": [
+   1007047,
+   610298
+  ],
+  "tB": [
+   906931,
+   351484
+  ],
+  "gA": [
+   32,
+   20
+  ],
+  "gB": [
+   27,
+   9
+  ]
+ },
+ {
+  "host": "target.com",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   7,
+   2
+  ],
+  "sB": [
+   7,
+   5
+  ],
+  "tA": [
+   1902545,
+   344240
+  ],
+  "tB": [
+   842708,
+   935627
+  ],
+  "gA": [
+   34,
+   12
+  ],
+  "gB": [
+   26,
+   27
+  ]
+ },
+ {
+  "host": "tv.sohu.com",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "fail",
+    false
+   ]
+  ],
+  "sA": [
+   5,
+   2
+  ],
+  "sB": [
+   6,
+   8
+  ],
+  "tA": [
+   1092514,
+   464917
+  ],
+  "tB": [
+   921473,
+   831094
+  ],
+  "gA": [
+   32,
+   16
+  ],
+  "gB": [
+   26,
+   24
+  ]
+ },
+ {
+  "host": "twitch.tv",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   4,
+   1
+  ],
+  "sB": [
+   5,
+   3
+  ],
+  "tA": [
+   696452,
+   121202
+  ],
+  "tB": [
+   446264,
+   201636
+  ],
+  "gA": [
+   23,
+   5
+  ],
+  "gB": [
+   16,
+   8
+  ]
+ },
+ {
+  "host": "vimeo.com",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   0,
+   1
+  ],
+  "sB": [
+   11,
+   3
+  ],
+  "tA": [
+   274671,
+   123781
+  ],
+  "tB": [
+   1300067,
+   236881
+  ],
+  "gA": [
+   11,
+   5
+  ],
+  "gB": [
+   36,
+   9
+  ]
+ },
+ {
+  "host": "wanfangdata.com.cn",
+  "vA": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   3,
+   5
+  ],
+  "sB": [
+   13,
+   12
+  ],
+  "tA": [
+   2106606,
+   500835
+  ],
+  "tB": [
+   843855,
+   1273295
+  ],
+  "gA": [
+   46,
+   17
+  ],
+  "gB": [
+   29,
+   33
+  ]
+ },
+ {
+  "host": "wenku.baidu.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   9,
+   2
+  ],
+  "sB": [
+   15,
+   1
+  ],
+  "tA": [
+   1414305,
+   250472
+  ],
+  "tB": [
+   612762,
+   181224
+  ],
+  "gA": [
+   39,
+   9
+  ],
+  "gB": [
+   20,
+   7
+  ]
+ },
+ {
+  "host": "you.163.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "fail",
+    false
+   ]
+  ],
+  "sA": [
+   12,
+   5
+  ],
+  "sB": [
+   11,
+   14
+  ],
+  "tA": [
+   3117035,
+   531960
+  ],
+  "tB": [
+   1578590,
+   692958
+  ],
+  "gA": [
+   73,
+   18
+  ],
+  "gB": [
+   37,
+   21
+  ]
+ },
+ {
+  "host": "youku.com",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "fail",
+    true
+   ]
+  ],
+  "sA": [
+   11,
+   2
+  ],
+  "sB": [
+   9,
+   5
+  ],
+  "tA": [
+   839176,
+   258279
+  ],
+  "tB": [
+   1147700,
+   1114082
+  ],
+  "gA": [
+   24,
+   9
+  ],
+  "gB": [
+   33,
+   32
+  ]
+ },
+ {
+  "host": "zalando.com",
+  "vA": [
+   [
+    "fail",
+    true
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   0,
+   6
+  ],
+  "sB": [
+   9,
+   5
+  ],
+  "tA": [
+   214691,
+   296189
+  ],
+  "tB": [
+   1247990,
+   269149
+  ],
+  "gA": [
+   9,
+   10
+  ],
+  "gB": [
+   35,
+   10
+  ]
+ },
+ {
+  "host": "zotero.org",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   2,
+   3
+  ],
+  "sB": [
+   9,
+   8
+  ],
+  "tA": [
+   343107,
+   302405
+  ],
+  "tB": [
+   1078836,
+   920683
+  ],
+  "gA": [
+   12,
+   11
+  ],
+  "gB": [
+   34,
+   27
+  ]
+ },
+ {
+  "host": "douban.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "partial",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   3,
+   0
+  ],
+  "sB": [
+   10,
+   4
+  ],
+  "tA": [
+   321918,
+   708089
+  ],
+  "tB": [
+   1033865,
+   432562
+  ],
+  "gA": [
+   11,
+   21
+  ],
+  "gB": [
+   33,
+   15
+  ]
+ },
+ {
+  "host": "eastmoney.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   5,
+   1
+  ],
+  "sB": [
+   6,
+   3
+  ],
+  "tA": [
+   240723,
+   146921
+  ],
+  "tB": [
+   364176,
+   169194
+  ],
+  "gA": [
+   10,
+   6
+  ],
+  "gB": [
+   14,
+   7
+  ]
+ },
+ {
+  "host": "gamersky.com",
+  "vA": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "fail",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   10,
+   1
+  ],
+  "sB": [
+   18,
+   5
+  ],
+  "tA": [
+   750442,
+   289273
+  ],
+  "tB": [
+   822915,
+   253595
+  ],
+  "gA": [
+   24,
+   10
+  ],
+  "gB": [
+   23,
+   9
+  ]
+ },
+ {
+  "host": "ign.com",
+  "vA": [
+   [
+    "partial",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   0,
+   4
+  ],
+  "sB": [
+   7,
+   7
+  ],
+  "tA": [
+   794574,
+   595948
+  ],
+  "tB": [
+   553637,
+   549842
+  ],
+  "gA": [
+   27,
+   20
+  ],
+  "gB": [
+   20,
+   20
+  ]
+ },
+ {
+  "host": "v.qq.com",
+  "vA": [
+   null,
+   [
+    "correct",
+    false
+   ]
+  ],
+  "vB": [
+   [
+    "correct",
+    false
+   ],
+   [
+    "correct",
+    false
+   ]
+  ],
+  "sA": [
+   null,
+   3
+  ],
+  "sB": [
+   15,
+   6
+  ],
+  "tA": [
+   3411649,
+   717577
+  ],
+  "tB": [
+   1943848,
+   552171
+  ],
+  "gA": [
+   46,
+   23
+  ],
+  "gB": [
+   46,
+   16
+  ]
+ }
+]
