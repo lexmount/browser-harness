@@ -1,6 +1,6 @@
 # Walmart — Product Search & Data Extraction
 
-Field-tested against walmart.com on 2026-04-18 using `http_get` (no browser required).
+Field-tested against walmart.com on 2026-04-18 using `http_get` (no browser required). (re-verified 2026-07-06)
 All code blocks were run and outputs verified against live responses.
 
 ---

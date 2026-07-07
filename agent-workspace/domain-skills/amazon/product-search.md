@@ -1,6 +1,6 @@
 # Amazon — Product Search & Data Extraction
 
-Field-tested against amazon.com on 2025-04-18 using a logged-in Chrome session.
+Field-tested against amazon.com on 2025-04-18 using a logged-in Chrome session. (re-verified 2026-07-06)
 No CAPTCHA or bot detection was triggered during any test run.
 
 ## Navigation

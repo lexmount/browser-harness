@@ -113,7 +113,7 @@
       <div class="k">泛化保留率 · <b>新任务上的增益 ≥ 原任务</b>，技能不是过拟合</div>
     </div>
     <div class="big">
-      <div class="n">−56→64%</div>
+      <div class="n">−59→66%</div>
       <div class="k">总token 消耗下降 · <b>省的比读文档花的多</b></div>
     </div>
   </div>
@@ -127,9 +127,10 @@
       <tbody>
         <tr class="row-h"><td>case A <span class="cap">（技能被调过）</span></td><td>71%</td><td>84%</td><td class="delta pos">+13pp</td><td>9</td><td>4</td><td>31</td></tr>
         <tr class="row-h"><td>case B <span class="cap">（没见过 / 泛化）</span></td><td>68%</td><td>84%</td><td class="delta pos">+16pp</td><td>12</td><td>4</td><td>41</td></tr>
+        <tr class="row-h" style="border-top:2px solid var(--line-strong)"><td><b>总体（A+B 汇总）</b></td><td><b>69.4%</b></td><td><b>84.0%</b></td><td class="delta pos"><b>+14.6pp</b></td><td>21</td><td>8</td><td><b>72</b></td></tr>
       </tbody>
     </table></div>
-    <p class="cap">成功率按 correct=1 / partial=0.5 / fail=0 计分；每格剔除任一臂因云基础设施失败的站后配对。两个对照组基线一致（71% / 68%），技能组都稳定拉到 84%。</p>
+    <p class="cap">成功率按 correct=1 / partial=0.5 / fail=0 计分；每格剔除任一臂因云基础设施失败的站后配对。两个对照组基线一致（71% / 68%），技能组都稳定拉到 84%。<b>总体</b>把 case A + case B 全部 72 个有效 site-task 汇到一起：对照 69.4% → 技能 84.0%，绝对 +14.6pp、相对 +21%；技能让 21 个变好、8 个变差。</p>
   </section>
 
   <section>
@@ -144,13 +145,13 @@
     <div class="scroll"><table>
       <thead><tr><th>任务集</th><th>指标</th><th>对照组</th><th>技能组</th><th>变化</th></tr></thead>
       <tbody>
-        <tr><td class="row-h">case A</td><td>总token</td><td>56.1M</td><td>20.3M</td><td class="delta pos">−64%</td></tr>
-        <tr><td></td><td>agent 轨迹步数</td><td>1423</td><td>657</td><td class="delta pos">−54%</td></tr>
-        <tr><td class="row-h">case B</td><td>总token</td><td>48.5M</td><td>21.2M</td><td class="delta pos">−56%</td></tr>
-        <tr><td></td><td>agent 轨迹步数</td><td>1401</td><td>658</td><td class="delta pos">−53%</td></tr>
+        <tr><td class="row-h">case A</td><td>总token</td><td>38.5M</td><td>13.1M</td><td class="delta pos">−66%</td></tr>
+        <tr><td class="row-h">case B</td><td>总token</td><td>44.4M</td><td>18.2M</td><td class="delta pos">−59%</td></tr>
+        <tr style="border-top:2px solid var(--line-strong)"><td class="row-h"><b>总体（A+B）</b></td><td>总token</td><td><b>82.9M</b></td><td><b>31.3M</b></td><td class="delta pos"><b>−62%</b></td></tr>
+        <tr><td></td><td>agent 轨迹步数</td><td>2280</td><td>1007</td><td class="delta pos">−56%</td></tr>
       </tbody>
     </table></div>
-    <p class="cap">token 为全量消耗（输入 + 缓存写入 + 缓存读取 + 输出，按 API 调用去重后从轨迹累加）。技能组还额外花 token 读了 skill 文件，但总消耗仍低一半以上——对照组每多试错一轮，就要把越滚越长的上下文整个重读一遍，输入端代价是平方级的。agent 轨迹步数为轨迹中全部工具调用（读文档、跑脚本、浏览器操作）的总数，harness 记录、不可伪造。</p>
+    <p class="cap"><b>与成功率同口径：剔除任一臂因基础设施(infra)失败的配对后统计</b>——infra 跑到一半会话就崩，其步数/token 是残值，不计入。token 为全量消耗（输入+缓存写入+缓存读取+输出，按 API 调用去重）；技能组还多读了 skill 文件，但对照组每多试错一轮就要把越滚越长的上下文整个重读，输入端平方级增长，所以总消耗仍低六成。agent 轨迹步数为轨迹中全部工具调用（读文档、跑脚本、浏览器操作）的总数，harness 记录、不可伪造。</p>
   </section>
 
   <section>

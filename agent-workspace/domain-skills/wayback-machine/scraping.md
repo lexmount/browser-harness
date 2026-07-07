@@ -1,5 +1,7 @@
 # Wayback Machine — CDX API & Snapshot Retrieval
 
+<!-- CDX core + snapshot retrieval re-verified 2026-07-06: CDX endpoint returns header row first, string values, :80 port preserved in `original`, all as documented. advancedsearch pattern added + verified live. -->
+
 `https://web.archive.org` — all public data, no auth or API key required. Everything here is pure `http_get` — no browser needed.
 
 > **NOTE:** A comprehensive Internet Archive skill (covering CDX, item metadata, and search) already exists at `domain-skills/archive-org/scraping.md`. This file is a focused, CDX-first quick-reference for Wayback Machine snapshot work specifically.
@@ -139,6 +141,32 @@ rows = json.loads(r)
 Default `fl=` when omitted: all 7 fields above in that order.
 
 ---
+
+## Searching the archive.org item catalog (footage/videos/audio/texts)
+
+CDX is for *snapshot* lookup. To **search the archive.org media catalog** (e.g. "find Apollo 11 moon landing footage"), use the **advancedsearch API** on `archive.org` (not `web.archive.org`). No auth. Fast (<1s). Verified live 2026-07-06.
+
+```python
+import json
+
+url = (
+    "https://archive.org/advancedsearch.php?"
+    "q=Apollo+11+moon+landing+AND+mediatype%3Amovies"   # mediatype: movies|audio|texts|image
+    "&fl[]=identifier&fl[]=title&fl[]=date&fl[]=year"
+    "&fl[]=creator&fl[]=uploader&fl[]=publicdate&fl[]=addeddate&fl[]=downloads"
+    "&sort[]=downloads+desc"        # or: publicdate+asc, week+desc, etc.
+    "&rows=10&page=1&output=json"
+)
+r = http_get(url, timeout=40.0)
+d = json.loads(r)
+print(d["response"]["numFound"])
+for x in d["response"]["docs"]:
+    print(x.get("identifier"), "|", x.get("title"), "|", x.get("date"), "|", x.get("creator"))
+# Result shape: {"response": {"numFound": N, "docs": [ {..fields..} ]}}
+```
+
+- **`creator` is the "uploader" for institutional items.** Many NASA/National-Archives/gov items have **no `uploader`** field at all (added via a collection, not a user account) — read `creator` + `addeddate`/`publicdate` instead. Don't report uploader=null as a failure; report the creator.
+- To pull all fields for one known item, query `q=identifier%3A<ID>` with the `fl[]` list you want. This is more reliable than the metadata API (see gotcha below).
 
 ## Availability API (DO NOT USE as primary)
 
@@ -302,5 +330,7 @@ No API key required. No documented rate limit. Be respectful: add `time.sleep(1)
 - **CDX `matchType=domain` can return millions of rows for popular sites.** Always add `&limit=` or `&showNumPages=true` first to estimate size.
 
 - **`showResumeKey=true` appends two sentinel rows.** The second-to-last row is `[]` (empty separator), the last row is `['<resume_key_string>']`. Slice `rows[1:-2]` for data rows when a resume key is present.
+
+- **Metadata API (`https://archive.org/metadata/<ID>`) can return `{"error":"item metadata may be invalid"}` for valid, well-archived items.** Hit live 2026-07-06 on `Apollo1116mmOnboardFilm` — persisted across 5 retries with backoff, both mainland (`http_get`) and cloud paths. It is NOT rate-limiting and retrying does not fix it. **Workaround that works: use `advancedsearch.php?q=identifier%3A<ID>&fl[]=...`** (see "Searching the archive.org item catalog" above) to pull the same title/date/creator/publicdate fields reliably.
 
 - **Wayback toolbar is injected into every archived HTML page.** The injection is wrapped in `<!-- BEGIN WAYBACK TOOLBAR INSERT -->` / `<!-- END WAYBACK TOOLBAR INSERT -->` comments. Strip them if you need original HTML fidelity.

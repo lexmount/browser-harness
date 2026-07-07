@@ -1,7 +1,8 @@
 # WeRead — Auto Reading
 
-Field-tested against weread.qq.com on 2026-05-06.
-Requires WeChat login for reading features.
+Field-tested against weread.qq.com on 2026-05-06 (re-verified 2026-07-06).
+Requires WeChat login for reading features. Search + book-detail metadata
+(author / rating / hot highlights) work WITHOUT login — see "Book Search & Detail Extraction" below.
 
 ---
 
@@ -35,6 +36,7 @@ Step 3: Auto reading (1 minute per session)
 | New Book | `https://weread.qq.com/web/category/newbook` |
 | Book Detail | `https://weread.qq.com/web/bookDetail/{BOOK_ID}` |
 | Reader | `https://weread.qq.com/web/reader/{BOOK_ID}k{CHAPTER_HASH}` |
+| Search | `https://weread.qq.com/web/search/books?author=&keyword={URL_ENCODED_KEYWORD}` |
 
 ### Reader URL Pattern
 
@@ -309,6 +311,67 @@ def click_mark_finished():
         click_at_xy(button["x"], button["y"])
         wait_for_load()
         time.sleep(1)
+```
+
+---
+
+## Book Search & Detail Extraction (no login required)
+
+Verified 2026-07-06: searching a book and reading its detail-page metadata works
+without WeChat login. Fields available vs. not:
+
+| Field | Available on web without login? | Source |
+|-------|--------------------------------|--------|
+| 书名 / title | ✅ | search list + detail page |
+| 作者 author | ✅ | detail page, `瑞·达利欧` |
+| 推荐值 rating | ✅ | detail page innerText, e.g. `81.7%` (may say `评分不足` if too few) |
+| 点评数 review count | ✅ | `.book_rating_item_detail_count`, e.g. `2.9万人点评` |
+| 热门划线 hot highlights | ✅ | detail-page innerText under `热门划线`, top 3 shown, plus `去 App 查看全部 N 个` |
+| 今日阅读 today's readers | ✅ | search list only, e.g. `1086人今日阅读` |
+| 出版社 publisher | ❌ needs login/App | not rendered on public web (`出版` absent from DOM) |
+| 阅读人数 total readers | ❌ needs login/App | only "今日阅读" is public; total reading count is App-only |
+
+The book-info JSON API `weread.qq.com/web/book/info?bookId=...` returns
+`{"errCode":-2010,"errMsg":"用户不存在"}` without login — do NOT rely on it for anon extraction.
+
+### Search flow
+
+```python
+# 1. Open search results (URL-encode the keyword)
+new_tab("https://weread.qq.com/web/search/books?author=&keyword=%E5%8E%9F%E5%88%99")
+wait_for_load(); wait(3)
+
+# 2. Results are clickable divs, NOT <a href*=bookDetail>. Header shows "共 N 条".
+#    Each result is `.wr_bookList_item` with `.wr_bookList_item_title` inside.
+pos = js("""
+    const items = document.querySelectorAll('.wr_bookList_item_title');
+    for (const el of items) {
+        if (el.textContent.trim() === '原则') {   // exact title match picks canonical book
+            const r = el.getBoundingClientRect();
+            return {x: r.x + r.width/2, y: r.y + r.height/2};
+        }
+    }
+    return null;
+""")
+click_at_xy(pos["x"], pos["y"])   # NOTE: clicking title opens the READER (/web/reader/{BOOK_ID}),
+wait_for_load()                    # not the detail page. Grab BOOK_ID from the reader URL,
+# 3. then open the detail page explicitly:
+book_id = page_info()["url"].split("/reader/")[1].split("k")[0]
+new_tab(f"https://weread.qq.com/web/bookDetail/{book_id}")
+wait_for_load(); wait(4)
+```
+
+### Detail extraction
+
+```python
+info = js("""
+    const out = {};
+    out.text = document.body.innerText;           // author, rating %, review count, hot highlights all live here
+    out.reviewCount = (document.querySelector('.book_rating_item_detail_count')||{}).textContent || '';
+    return out;
+""")
+# Parse from out.text: author is the line after title; rating like "81.7%" follows "微信读书推荐值";
+# top-3 hot highlights are the lines under "热门划线", each followed by ":-)等 N 人划线".
 ```
 
 ---

@@ -1,6 +1,6 @@
 # Hacker News — Data Extraction
 
-`https://news.ycombinator.com` — YCombinator's link aggregator. Three access paths tested: `http_get` DOM scraping, Algolia search API, and the official HN Firebase API. All work without a browser.
+`https://news.ycombinator.com` — YCombinator's link aggregator. Three access paths tested: `http_get` DOM scraping, Algolia search API, and the official HN Firebase API. All work without a browser. (re-verified 2026-07-06)
 
 ## Do this first: pick your access path
 
