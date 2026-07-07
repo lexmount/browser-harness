@@ -347,6 +347,32 @@ def test_wait_for_element_returns_false_when_js_fails_until_timeout():
         assert helpers.wait_for_element("#missing", timeout=5.0) is False
 
 
+def test_wait_for_element_reraises_permanent_js_error():
+    # A deterministic probe failure (e.g. malformed CSS selector) throws the
+    # same JS exception on every poll — swallowing it would burn the full
+    # timeout and return False, indistinguishable from "element absent".
+    def fake_js(expr, **kwargs):
+        raise RuntimeError(
+            "JavaScript evaluation failed: 'div[' is not a valid selector"
+        )
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js):
+        with pytest.raises(RuntimeError, match="not a valid selector"):
+            helpers.wait_for_element("div[", timeout=5.0)
+
+
+def test_wait_for_load_reraises_daemon_fatal_error():
+    # Daemon-relayed fatal errors (dead Chrome websocket, no attached tab)
+    # are not "not ready yet" — they must surface on the first probe instead
+    # of masquerading as a slow page for the full timeout.
+    def fake_js(expr, **kwargs):
+        raise RuntimeError("cdp_disconnected")
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js):
+        with pytest.raises(RuntimeError, match="cdp_disconnected"):
+            helpers.wait_for_load(timeout=5.0)
+
+
 # --- wait_for_network_idle ---
 
 def test_wait_for_network_idle_returns_true_when_no_events():

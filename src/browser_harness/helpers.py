@@ -390,17 +390,29 @@ def iframe_target(url_substr):
 def wait(seconds=1.0):
     time.sleep(seconds)
 
+# CDP errors that mean a navigation tore down the execution context and it
+# hasn't been recreated yet — the only failures a poll loop may safely read
+# as "not ready yet". Everything else (JS exceptions in the probe, daemon /
+# connection failures, evaluate timeouts) is permanent for the loop's
+# purposes and must surface immediately, not burn the full timeout.
+_TRANSIENT_NAV_ERRORS = (
+    "Execution context was destroyed",
+    "Cannot find default execution context",
+    "Cannot find context with specified id",
+    "Inspected target navigated or closed",
+)
+
+def _is_transient_nav_error(exc):
+    return any(s in str(exc) for s in _TRANSIENT_NAV_ERRORS)
+
 def wait_for_load(timeout=15.0):
     """Poll document.readyState == 'complete' or timeout."""
     deadline = time.time() + timeout
     while time.time() < deadline:
-        # Mid-navigation, Runtime.evaluate fails with "Execution context was
-        # destroyed" / "Cannot find default execution context" — that means
-        # "not ready yet", not a fatal error, so keep polling.
         try:
             if js("document.readyState") == "complete": return True
-        except RuntimeError:
-            pass
+        except RuntimeError as e:
+            if not _is_transient_nav_error(e): raise
         time.sleep(0.3)
     return False
 
@@ -430,12 +442,10 @@ def wait_for_element(selector, timeout=10.0, visible=False):
         check = f"!!document.querySelector({json.dumps(selector)})"
     deadline = time.time() + timeout
     while time.time() < deadline:
-        # A RuntimeError here is usually the execution context being torn
-        # down by an in-flight navigation — treat as "not ready yet".
         try:
             if js(check): return True
-        except RuntimeError:
-            pass
+        except RuntimeError as e:
+            if not _is_transient_nav_error(e): raise
         time.sleep(0.3)
     return False
 
