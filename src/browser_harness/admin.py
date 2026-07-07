@@ -104,6 +104,20 @@ def _process_start_time(pid):
     return None
 
 
+def _pid_alive(pid):
+    """Liveness probe safe on both platforms. On Windows os.kill(pid, 0) is NOT
+    a probe — sig 0 is CTRL_C_EVENT, so it fires GenerateConsoleCtrlEvent and
+    reports success whether or not `pid` is alive; use the kernel-reported
+    start time instead (None once the process is gone)."""
+    if ipc.IS_WINDOWS:
+        return _process_start_time(pid) is not None
+    try:
+        os.kill(pid, 0)
+        return True
+    except (ProcessLookupError, OSError, SystemError, OverflowError):
+        return False
+
+
 def _load_env():
     repo_root = Path(__file__).resolve().parents[2]
     workspace = paths.workspace_dir()
@@ -416,11 +430,9 @@ def restart_daemon(name=None):
 
     if daemon_pid is not None:
         for _ in range(75):
-            try:
-                os.kill(daemon_pid, 0)
-                time.sleep(0.2)
-            except (ProcessLookupError, OSError, SystemError, OverflowError):
+            if not _pid_alive(daemon_pid):
                 break
+            time.sleep(0.2)
         else:
             # Re-verify identity before escalating to SIGTERM. Two acceptable
             # signals, in priority order:
@@ -720,7 +732,9 @@ def print_update_banner(out=None):
         return
     print(f"[browser-harness] update available: {cur} -> {latest}", file=out)
     print(f"[browser-harness] agents: run `browser-harness --update -y` to upgrade and restart the daemon", file=out)
-    _cache_write({**cache, "banner_shown_on": today})
+    # Re-read: check_for_update() above may have fetched PyPI and written fresh
+    # {tag, fetched_at}; writing the pre-fetch snapshot back would erase them.
+    _cache_write({**_cache_read(), "banner_shown_on": today})
 
 
 def _chrome_running():

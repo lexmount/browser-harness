@@ -162,6 +162,11 @@ def identify(name, timeout=1.0):
         except OSError: pass
 
 
+# One JSON request per line; js() payloads and long type_text() calls easily
+# exceed asyncio's 64 KiB default stream limit, so readline() would reject them.
+_STREAM_LIMIT = 1 << 24  # 16 MiB
+
+
 async def serve(name, handler):
     """Run the server until cancelled. handler(reader, writer) sees the same interface either way."""
     global _server_token
@@ -170,12 +175,12 @@ async def serve(name, handler):
         if os.path.exists(path): os.unlink(path)
         # umask 0o077 makes bind() create the socket as 0600 — no TOCTOU window before chmod.
         old_umask = os.umask(0o077)
-        try: server = await asyncio.start_unix_server(handler, path=path)
+        try: server = await asyncio.start_unix_server(handler, path=path, limit=_STREAM_LIMIT)
         finally: os.umask(old_umask)
         _server_token = None
         async with server: await asyncio.Event().wait()
         return
-    server = await asyncio.start_server(handler, "127.0.0.1", 0)
+    server = await asyncio.start_server(handler, "127.0.0.1", 0, limit=_STREAM_LIMIT)
     port = server.sockets[0].getsockname()[1]
     _server_token = secrets.token_hex(32)
     pf = port_path(name)

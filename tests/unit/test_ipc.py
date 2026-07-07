@@ -126,3 +126,53 @@ def test_ping_returns_false_when_pong_field_is_missing_or_not_true(monkeypatch):
         assert ipc.ping("default", timeout=0.0) is False, (
             f"ping() should require pong is exactly True; got: {resp!r}"
         )
+
+
+def test_serve_accepts_requests_larger_than_64kib(monkeypatch, tmp_path):
+    """asyncio's default stream limit is 64 KiB per line. The daemon frames one
+    JSON request per line and payloads like js() with a bundled library or a
+    long type_text() easily exceed that; serve() must raise the limit or every
+    such request dies with "Separator is not found, and chunk exceed the limit"."""
+    import asyncio, json, tempfile
+
+    # AF_UNIX sun_path is 104 bytes on macOS; pytest tmp_path can blow the
+    # budget, so bind in a short /tmp dir like the dev wrapper does.
+    short_dir = tempfile.mkdtemp(prefix="bh-ipc-", dir="/tmp")
+    monkeypatch.setattr(ipc, "IS_WINDOWS", False)
+    monkeypatch.setattr(ipc, "BH_RUNTIME_DIR", short_dir)
+    monkeypatch.setattr(ipc, "BH_RUNTIME_DIR_SHARED", False)
+    from pathlib import Path
+    monkeypatch.setattr(ipc, "_RUNTIME", Path(short_dir))
+
+    payload = "x" * (128 * 1024)  # 2x the default limit
+
+    async def scenario():
+        async def handler(reader, writer):
+            # Mirrors daemon.serve(): one readline per connection.
+            try:
+                line = await reader.readline()
+                req = json.loads(line)
+                resp = {"len": len(req["payload"])}
+            except Exception as e:
+                resp = {"error": str(e)}
+            writer.write((json.dumps(resp) + "\n").encode())
+            await writer.drain()
+            writer.close()
+
+        serve_task = asyncio.create_task(ipc.serve("default", handler))
+        await asyncio.sleep(0.1)  # let the socket bind
+        try:
+            reader, writer = await asyncio.open_unix_connection(
+                str(ipc._sock_path("default")), limit=1 << 24
+            )
+            writer.write((json.dumps({"payload": payload}) + "\n").encode())
+            await writer.drain()
+            line = await asyncio.wait_for(reader.readline(), timeout=5)
+            writer.close()
+            return json.loads(line)
+        finally:
+            serve_task.cancel()
+
+    resp = asyncio.run(scenario())
+    assert resp.get("error") is None, f"oversized request rejected: {resp}"
+    assert resp.get("len") == len(payload)

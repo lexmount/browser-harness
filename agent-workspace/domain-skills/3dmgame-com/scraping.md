@@ -75,3 +75,42 @@ Confirmed reachable from local China IP (status 200, count 375 identical to clou
 - **`mods_desc` can be thin.** For simple tool/trainer mods it just repeats the title. If you need a richer functional writeup, load `/mod/<id>` and read the rendered body text.
 - **GET on getModlist = 404.** It is POST-only with a JSON body; a GET (even with `?search=`) returns a Nuxt 404 page.
 - No anti-bot / no rate-limit hit during full 16-page parallel pulls on both IPs.
+
+## 主站新闻 / 补丁资讯搜索 (www.3dmgame.com) — 源自 A/site_hints,已 Lexmount 复验 2026-07-07
+
+上面整套是 **mod 站** (mod.3dmgame.com)。**主站** (www.3dmgame.com) 的新闻/补丁/资讯是另一条线,
+用主站搜索子域 `so.3dmgame.com`,`type=7` = 新闻搜索。本地 http_get 直连即可,无反爬、无登录、UTF-8。
+
+`https://so.3dmgame.com/?keyword=<url-encoded 关键词>&type=7`
+
+返回 SSR HTML,新闻结果是形如 `https://www.3dmgame.com/news/<YYYYMM>/<id>.html` 的文章链接。
+
+```python
+import urllib.request, re, urllib.parse
+def _get(url, ref="https://www.3dmgame.com/"):
+    req = urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0","Referer":ref})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return r.read().decode("utf-8", "replace")
+
+kw = urllib.parse.quote("赛博朋克2077")
+body = _get(f"https://so.3dmgame.com/?keyword={kw}&type=7")
+# 每条新闻: <a href="...news/YYYYMM/ID.html">标题</a>(锚文本可能含标签,清一下)
+seen, rows = set(), []
+for u, inner in re.findall(r'href="(https?://www\.3dmgame\.com/news/\d+/\d+\.html)"[^>]*>(.*?)</a>', body, re.S):
+    if u in seen: continue
+    seen.add(u)
+    title = re.sub(r'<[^>]+>', '', inner).strip()
+    if title: rows.append((title, u))
+for title, u in rows[:8]:
+    print(title, "|", u)
+# 实测 2026-07-07 前几条: 《赛博朋克2077》发售六年后 销量突破4000万套 | .../news/202607/3947687.html ...
+```
+
+进补丁说明详情页时,文章页正文 `document.body.innerText`(或对正文容器正则)即可拿到版本号/更新内容;
+下载链接常在文末,若文章无直链则按 A 的建议报"未观察到直接下载"并给出资源页。
+
+### Gotchas(主站)
+- **`type=7` 是新闻搜索**。主站搜索还有其它 type(游戏专区/资源等),新闻类任务用 7。
+- 主站搜索返回的是**新闻文章**,不是补丁资源列表本身——补丁下载页要点进文章或游戏专区找。想直接要 MOD
+  列表数据仍走上面的 mod 站 `getModlist` API。
+- 本地 http_get 通(2026-07-07 主站/搜索子域均从大陆 IP 直取 200),未见反爬。

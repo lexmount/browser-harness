@@ -757,3 +757,76 @@ def test_ensure_daemon_survives_probe_socket_close_failure(monkeypatch):
     monkeypatch.setattr(admin.ipc, "request", lambda s, token, payload: {"result": {}})
 
     admin.ensure_daemon()
+
+
+def test_restart_daemon_windows_wait_loop_detects_exit_without_os_kill(monkeypatch, tmp_path):
+    """On Windows os.kill(pid, 0) is GenerateConsoleCtrlEvent(CTRL_C_EVENT, pid),
+    which succeeds whether or not the process is alive — it is not a liveness
+    probe, so the wait loop never sees the daemon exit and stalls the full 15s
+    on every restart. The loop must probe liveness via the start-time
+    fingerprint on Windows and never call os.kill(pid, 0) there."""
+    pid_path = tmp_path / "default.pid"
+    pid_path.write_text("4242")
+    live_pid = 4242
+
+    kill_calls = []
+    sleeps = []
+    # Snapshot call (top of restart_daemon) sees the process; every later
+    # probe sees it gone — the daemon exited promptly after the shutdown IPC.
+    start_times = iter(["STARTED_AT_X"])
+    monkeypatch.setattr(admin.ipc, "IS_WINDOWS", True)
+    monkeypatch.setattr(admin, "_process_start_time", lambda pid: next(start_times, None))
+    monkeypatch.setattr(admin.os, "kill", lambda pid, sig: kill_calls.append((pid, sig)))
+    monkeypatch.setattr(admin.time, "sleep", lambda s: sleeps.append(s))
+    monkeypatch.setattr(admin.ipc, "identify", lambda name, timeout=5.0: live_pid)
+    monkeypatch.setattr(admin.ipc, "ping", lambda name, timeout=1.0: True)
+    monkeypatch.setattr(admin.ipc, "connect", lambda name, timeout: ("conn", "tok"))
+    monkeypatch.setattr(admin.ipc, "request", lambda conn, tok, msg: {"ok": True})
+    monkeypatch.setattr(admin.ipc, "pid_path", lambda name: pid_path)
+    monkeypatch.setattr(admin.ipc, "cleanup_endpoint", lambda name: None)
+
+    admin.restart_daemon("default")
+
+    assert kill_calls == [], (
+        f"os.kill must not run on Windows for liveness probing — sig 0 fires "
+        f"GenerateConsoleCtrlEvent, not a process check. Calls: {kill_calls}"
+    )
+    assert sleeps == [], (
+        f"daemon exit must be detected on the first probe (no 15s stall); "
+        f"slept {len(sleeps)} times"
+    )
+    assert not pid_path.exists()
+
+
+def test_print_update_banner_preserves_freshly_fetched_version_cache(monkeypatch, tmp_path):
+    """print_update_banner snapshots the cache, then check_for_update() fetches
+    PyPI and writes fresh {tag, fetched_at}. Writing the stale snapshot back
+    afterwards must not clobber the fresh fetch — otherwise the 24h TTL never
+    holds on banner days and later calls re-hit PyPI."""
+    import io, json, time
+
+    cache_file = tmp_path / "version-cache.json"
+    monkeypatch.setattr(admin, "VERSION_CACHE", cache_file)
+    # Yesterday's fetch: TTL expired, so check_for_update() re-fetches PyPI.
+    stale_fetched_at = time.time() - admin.VERSION_CACHE_TTL - 60
+    admin._cache_write({"tag": "0.0.9", "fetched_at": stale_fetched_at})
+    monkeypatch.setattr(admin, "_version", lambda: "0.1.0")
+
+    class FakeResp:
+        def read(self):
+            return json.dumps({"info": {"version": "9.9.9"}}).encode()
+
+    monkeypatch.setattr(admin.urllib.request, "urlopen", lambda url, timeout=5: FakeResp())
+
+    out = io.StringIO()
+    admin.print_update_banner(out=out)
+
+    assert "update available" in out.getvalue()
+    cache = admin._cache_read()
+    assert cache.get("banner_shown_on") == time.strftime("%Y-%m-%d")
+    assert cache.get("tag") == "9.9.9", (
+        f"banner bookkeeping clobbered the freshly fetched tag: {cache}"
+    )
+    assert cache.get("fetched_at", 0) > stale_fetched_at, (
+        f"banner bookkeeping reverted fetched_at to the stale snapshot: {cache}"
+    )
