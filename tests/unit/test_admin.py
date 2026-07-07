@@ -674,3 +674,56 @@ def test_process_start_time_returns_none_for_invalid_pid():
         )
     # 2**31 - 1 is the largest pid_t; in practice no live process at that PID.
     assert admin._process_start_time((1 << 31) - 1) is None
+
+
+# --- ensure_daemon warm probe ---
+
+def test_ensure_daemon_closes_warm_probe_socket_on_healthy_daemon(monkeypatch):
+    sock = FakeSocket()
+    monkeypatch.setattr(admin, "daemon_alive", lambda name=None: True)
+    monkeypatch.setattr(admin.ipc, "connect", lambda name, timeout: (sock, "token"))
+    monkeypatch.setattr(admin.ipc, "request", lambda s, token, payload: {"result": {}})
+
+    admin.ensure_daemon()
+
+    assert sock.closed, "warm-probe socket must be closed when the daemon is healthy"
+
+
+def test_ensure_daemon_closes_warm_probe_socket_when_probe_fails(monkeypatch):
+    sock = FakeSocket()
+
+    class Restarted(Exception):
+        pass
+
+    def fake_request(s, token, payload):
+        raise RuntimeError("CDP WS to Chrome is dead")
+
+    def fake_restart(name):
+        raise Restarted
+
+    monkeypatch.setattr(admin, "daemon_alive", lambda name=None: True)
+    monkeypatch.setattr(admin.ipc, "connect", lambda name, timeout: (sock, "token"))
+    monkeypatch.setattr(admin.ipc, "request", fake_request)
+    monkeypatch.setattr(admin, "restart_daemon", fake_restart)
+
+    with pytest.raises(Restarted):
+        admin.ensure_daemon()
+
+    assert sock.closed, "warm-probe socket must be closed when the CDP probe fails"
+
+
+# --- run_update ---
+
+def test_run_update_pypi_mode_reports_missing_uv(monkeypatch, capsys):
+    import subprocess
+
+    monkeypatch.setattr(admin, "check_for_update", lambda: ("1.0", "2.0", True))
+    monkeypatch.setattr(admin, "_install_mode", lambda: "pypi")
+
+    def missing_uv(cmd, *args, **kwargs):
+        raise FileNotFoundError(2, "No such file or directory", cmd[0])
+
+    monkeypatch.setattr(subprocess, "run", missing_uv)
+
+    assert admin.run_update(yes=True) == 1
+    assert "uv" in capsys.readouterr().err
