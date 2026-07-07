@@ -394,7 +394,13 @@ def wait_for_load(timeout=15.0):
     """Poll document.readyState == 'complete' or timeout."""
     deadline = time.time() + timeout
     while time.time() < deadline:
-        if js("document.readyState") == "complete": return True
+        # Mid-navigation, Runtime.evaluate fails with "Execution context was
+        # destroyed" / "Cannot find default execution context" — that means
+        # "not ready yet", not a fatal error, so keep polling.
+        try:
+            if js("document.readyState") == "complete": return True
+        except RuntimeError:
+            pass
         time.sleep(0.3)
     return False
 
@@ -424,7 +430,12 @@ def wait_for_element(selector, timeout=10.0, visible=False):
         check = f"!!document.querySelector({json.dumps(selector)})"
     deadline = time.time() + timeout
     while time.time() < deadline:
-        if js(check): return True
+        # A RuntimeError here is usually the execution context being torn
+        # down by an in-flight navigation — treat as "not ready yet".
+        try:
+            if js(check): return True
+        except RuntimeError:
+            pass
         time.sleep(0.3)
     return False
 
