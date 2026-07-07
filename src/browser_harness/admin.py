@@ -324,7 +324,8 @@ def ensure_daemon(wait=60.0, name=None, env=None):
         except Exception: pass
         finally:
             if s:
-                s.close()
+                try: s.close()
+                except OSError: pass
         restart_daemon(name)
 
     import subprocess, sys
@@ -847,7 +848,11 @@ def run_update(yes=False):
     mode = _install_mode()
     if mode == "git":
         repo = _repo_dir()
-        status = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"], capture_output=True, text=True)
+        try:
+            status = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"], capture_output=True, text=True)
+        except FileNotFoundError:
+            print("git not found on PATH; can't auto-update. Install git, then run `git -C %s pull`." % repo, file=sys.stderr)
+            return 1
         if status.returncode != 0:
             print(f"git status failed: {status.stderr.strip()}", file=sys.stderr)
             return 1
