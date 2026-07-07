@@ -316,11 +316,15 @@ def ensure_daemon(wait=60.0, name=None, env=None):
         # CDP WS to Chrome is dead — probe with a real CDP call and require "result".
         # Must go through ipc.connect so this works on Windows (TCP loopback) too;
         # raw AF_UNIX here would fail on every warm call and churn the daemon.
+        s = None
         try:
             s, token = ipc.connect(name or NAME, timeout=3.0)
             resp = ipc.request(s, token, {"method": "Target.getTargets", "params": {}})
             if "result" in resp: return
         except Exception: pass
+        finally:
+            if s:
+                s.close()
         restart_daemon(name)
 
     import subprocess, sys
@@ -855,7 +859,11 @@ def run_update(yes=False):
         if r.returncode != 0:
             return r.returncode
     elif mode == "pypi":
-        tool_upgrade = subprocess.run(["uv", "tool", "upgrade", "browser-harness"])
+        try:
+            tool_upgrade = subprocess.run(["uv", "tool", "upgrade", "browser-harness"])
+        except FileNotFoundError:
+            print("uv not found on PATH; can't auto-update. Upgrade manually, e.g. `pip install -U browser-harness`.", file=sys.stderr)
+            return 1
         if tool_upgrade.returncode != 0:
             return tool_upgrade.returncode
     else:

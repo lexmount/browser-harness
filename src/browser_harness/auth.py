@@ -466,15 +466,18 @@ def _write_private_json(path: Path, data: dict) -> None:
     raw = (json.dumps(data, indent=2) + "\n").encode()
     flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
     fd = os.open(path, flags, stat.S_IRUSR | stat.S_IWUSR)
+    # Once fdopen succeeds the file object owns fd; closing it again here could
+    # close a descriptor another thread has since been handed the same number for.
     try:
-        with os.fdopen(fd, "wb") as f:
-            f.write(raw)
+        f = os.fdopen(fd, "wb")
     except BaseException:
         try:
             os.close(fd)
         except OSError:
             pass
         raise
+    with f:
+        f.write(raw)
 
 
 def _chmod_private(path: Path, *, directory=False) -> None:
