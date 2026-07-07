@@ -73,3 +73,59 @@ r = js("""(function(){
 - **symbol 前缀**：直盘/在岸都用 `fx_s`+小写代码；另有一个不带前缀的 `list=USDCNY`（新浪自算），字段索引 5/6/7/8 = 开/高/低/最新 与 fx_s 版一致，二选一都行，fx_susdcny 更稳。
 - **DNS 失效的旧接口**（别用，实测 `nodename nor servname` 解析失败）：`gu.sina.com.cn/global/finance/foreign/kline`、`gu.sina.com.cn/api/openapi.php/GlobalService.getDayKLineNew`。当前有效的日K入口就是上面 `vip.stock.finance.sina.com.cn/forex/api/jsonp.php/.../NewForexService.getDayKLine`。
 - **云出口是香港IP**：本次页面(new_tab)从香港IP也能正常加载 hq.sinajs.cn，未见对新浪的香港封锁；实时接口用本地 http_get 即可，无需为此站切云。
+
+## 黄金行情 + 分析师后市预测 — 源自 A/site_hints,已 Lexmount 复验 2026-07-07
+
+上面是外汇(fx_)。**黄金**任务(国际金价 + 上海金交所 Au9999 + 涨跌幅 + 分析师看涨/看跌)走同一
+`hq.sinajs.cn` 行情族 + 一个黄金分析 roll 频道页,两步。
+
+### 1) 金价快照 — `hq.sinajs.cn/list=hf_XAU,SGE_AU9999`(本地 http_get,同样 Referer + GBK)
+
+一次拿两个 symbol:
+- `hf_XAU` = **伦敦金/现货黄金**,美元/盎司(即任务要的"国际金价")。
+- `SGE_AU9999` = **上海金交所 Au9999**,人民币元/克。
+
+```python
+import urllib.request, re
+def _get(url, ref="https://finance.sina.com.cn/"):
+    req = urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0","Referer":ref})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return r.read()
+
+raw = _get("https://hq.sinajs.cn/list=hf_XAU,SGE_AU9999").decode("gbk", "replace")
+# 实测 2026-07-07 返回两行:
+# var hq_str_hf_XAU="4132.38,4164.750,4132.38,4132.73,4168.37,4124.34,12:18:00,4164.75,4164.62,0,0,0,2026-07-07,伦敦金（现货黄金）";
+# var hq_str_SGE_AU9999="AU9999,沪  金99,Au99.99,902.50,903.68,907.77,906.50,909.00,901.50,907.50,902.00,903.00,1025.00,31.00,95534.00,86333328000.00,2026-07-07 11:34:47,-0.55%";
+xau = re.search(r'hf_XAU="([^"]*)"', raw).group(1).split(",")
+au  = re.search(r'SGE_AU9999="([^"]*)"', raw).group(1).split(",")
+print("伦敦金(美元/盎司) 最新≈", xau[7], "| 名称", xau[-1])   # 4164.75
+print("Au9999(元/克) 涨跌幅", au[-1])                          # -0.55%(末位就是涨跌幅%)
+```
+字段索引说明(与外汇 fx_ 前缀不同,务必按现货页核对):
+- `hf_XAU`:第 7 项 ≈ 当前最新价(实测 4164.75 美元/盎司);首尾还有开/高/低、日期、中文名。
+- `SGE_AU9999`:前面是若干价格档(902~909 元/克区间),**最后一项 = 当日涨跌幅百分比**(`-0.55%`),倒数第二项是时间戳。具体某档对应"最新/开/高/低"请对黄金页文本核对一次再固化,不要盲信索引。
+
+### 2) 分析师后市预测 — roll 频道 `roll/c/57085.shtml`(须云浏览器 DOM)
+
+频道 **57085 = 黄金分析**(页面 title「黄金分析_贵金属_新浪财经」)。文章列表是 JS feed 加载的,
+**裸 http_get 只回 JS 壳**(拿不到标题),用云浏览器读渲染后的标题即可,标题本身就带看涨/看跌倾向。
+
+```python
+new_tab("https://finance.sina.com.cn/roll/c/57085.shtml"); wait_for_load(); wait(3)
+titles = js("""(function(){
+  return JSON.stringify([...document.querySelectorAll('a')]
+    .map(a=>a.innerText.trim())
+    .filter(t=>t.length>=8 && t.length<=40 && /金|涨|跌|美元|黄金|多头|空头|后市/.test(t))
+    .slice(0,8));
+})()""")
+print(titles)
+# 实测 2026-07-07: 「策略师：黄金筑底信号显现，金银走势分化」「光大期货0707黄金点评：金价止跌企稳...」
+# 「美国经济"胀而不滞" 黄金价格或震荡整固」「黄力晨:黄金冲高4200美元遇阻 走势暂时震荡调整」...
+# 从标题措辞即可归纳短期倾向(筑底/企稳/震荡/遇阻),需要理由再点进单篇文章正文。
+```
+
+### Gotchas(黄金)
+- `hf_XAU`/`SGE_AU9999` 与外汇一样:GBK + 必带 Referer,本地 http_get 直取,无反爬。
+- roll 频道页 http_get 拿不到文章标题(JS feed),必须云浏览器 DOM;若要纯接口需另找该频道的
+  feed.mix.sina 参数(本次未凿通正确 pageid,DOM 已够用)。
+- 金价字段索引未像外汇那样逐格钉死——先用一次现货页文本核对再固化到代码,避免拿错档位。

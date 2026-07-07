@@ -486,3 +486,21 @@ for item in items[:5]:
 - **`list_price` only present when discounted** — `offers.priceSpecification` only appears in JSON-LD when eBay shows a "List Price" comparison. Check `price_spec.get('name') == 'List Price'` before using.
 
 - **Seller data is NOT in JSON-LD** — `d.get('seller')` returns `None` on item pages. The seller name, feedback %, and items sold count are only in `ux-textspans` elements in the HTML body.
+
+## Auction "most bids" sort — `_sop=5` (源自 A/site_hints,已 Lexmount 复验 2026-07-07)
+
+For "top items by number of bids" auction tasks, do NOT sort by "ending soonest" and eyeball the bid
+counts — eBay has a native **sort-by-most-bids** parameter:
+
+`https://www.ebay.com/sch/i.html?_nkw=<query>&LH_Auction=1&_sop=5`
+
+- `LH_Auction=1` restricts to auctions (drops Buy-It-Now).
+- `_sop=5` sorts by **number of bids, most first**. Verified 2026-07-07 (cloud browser, "vintage camera"):
+  the active sort control read exactly `Number of bids: most first` and the on-page bid counts came out
+  strictly descending — `[95, 38, 33, 28, 27, 25, 23, 16, 16, 16, 15, 14]`. So the top-N cards are already
+  the most-bid listings; just read them top-down, no manual scan.
+- Same transport constraint as the rest of this file: local mainland `http_get` on `/sch/*` is 403 since
+  2026-07-06 → use the cloud browser (exits via HK IP, so prices render HKD; **bid counts and titles are
+  unaffected**).
+- `_sop` cheat-sheet confirmed on this site: `1`=ending soonest, `10`=newly listed, `12`=best match
+  (default), **`5`=most bids**.
