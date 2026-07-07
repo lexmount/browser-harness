@@ -1,1 +1,30 @@
-{"ctrlA": 2579357, "skillA": 1736781, "ctrlB": 2332487, "skillB": 1801860}
+{
+  "ctrlA": {
+    "input": 3588,
+    "cache_creation": 2287502,
+    "cache_read": 53369511,
+    "output": 404410,
+    "total": 56065011
+  },
+  "ctrlB": {
+    "input": 2178,
+    "cache_creation": 1729664,
+    "cache_read": 46306585,
+    "output": 509147,
+    "total": 48547574
+  },
+  "skillA": {
+    "input": 1995,
+    "cache_creation": 1111928,
+    "cache_read": 18903786,
+    "output": 246429,
+    "total": 20264138
+  },
+  "skillB": {
+    "input": 1463,
+    "cache_creation": 1138263,
+    "cache_read": 19786545,
+    "output": 286203,
+    "total": 21212474
+  }
+}
