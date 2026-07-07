@@ -3,7 +3,7 @@
 Core helpers live here. Agent-editable helpers live in
 BH_AGENT_WORKSPACE/agent_helpers.py.
 """
-import base64, importlib.util, json, math, os, sys, time, urllib.request
+import base64, importlib.util, json, math, os, time, urllib.request
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -219,14 +219,15 @@ def fill_input(selector, text, clear_first=True, timeout=0.0):
     if not focused:
         raise RuntimeError(f"fill_input: element not found: {selector!r}")
     if clear_first:
-        # Dispatch select-all directly — NOT via press_key, which always emits a
-        # `char` event for single-char keys. With Ctrl/Cmd held, that `char`
-        # makes Chrome treat the input as a printable "a" instead of firing the
-        # select-all shortcut, leaving the field uncleared.
-        mods = 4 if sys.platform == "darwin" else 2  # Cmd on macOS, Ctrl elsewhere
-        select_all = {"key": "a", "code": "KeyA", "modifiers": mods,
+        # Select all via CDP's editing command, executed by the renderer
+        # regardless of its OS. A Cmd/Ctrl+A chord picked from the client OS
+        # (sys.platform) breaks when the browser runs elsewhere — e.g. a macOS
+        # client driving a Linux cloud browser, where Meta+A is a no-op.
+        # Dispatched directly rather than via press_key, which would emit a
+        # `char` event that types a literal "a".
+        select_all = {"key": "a", "code": "KeyA",
                       "windowsVirtualKeyCode": 65, "nativeVirtualKeyCode": 65}
-        cdp("Input.dispatchKeyEvent", type="rawKeyDown", **select_all)
+        cdp("Input.dispatchKeyEvent", type="rawKeyDown", commands=["selectAll"], **select_all)
         cdp("Input.dispatchKeyEvent", type="keyUp", **select_all)
         press_key("Backspace")
     for ch in text:
