@@ -277,6 +277,102 @@ def test_wait_for_element_non_visible_uses_simple_check():
     assert any("querySelector" in e and "offsetParent" not in e for e in js_exprs)
 
 
+# --- poll loops must survive js() RuntimeError during navigation ---
+# Runtime.evaluate routinely fails with "Execution context was destroyed" /
+# "Cannot find default execution context" while a navigation is in flight —
+# exactly the window these helpers exist to bridge. The daemon relays that as
+# a RuntimeError from js(); the poll loops must treat it as "not ready yet".
+
+def test_wait_for_load_keeps_polling_when_context_destroyed():
+    calls = 0
+
+    def fake_js(expr, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise RuntimeError("Execution context was destroyed.")
+        return "complete"
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js), \
+         patch("browser_harness.helpers.time") as mock_time:
+        start = 1000.0
+        # init deadline, iter1 while-check (js raises), iter2 while-check (js completes)
+        mock_time.time.side_effect = [start, start + 0.1, start + 0.4]
+        mock_time.sleep = lambda _: None
+        assert helpers.wait_for_load(timeout=5.0) is True
+    assert calls == 2
+
+
+def test_wait_for_load_returns_false_when_js_fails_until_timeout():
+    def fake_js(expr, **kwargs):
+        raise RuntimeError("Cannot find default execution context")
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js), \
+         patch("browser_harness.helpers.time") as mock_time:
+        start = 1000.0
+        # init deadline, iter1 while-check (js raises), iter2 while-check past deadline
+        mock_time.time.side_effect = [start, start + 0.1, start + 20.0]
+        mock_time.sleep = lambda _: None
+        assert helpers.wait_for_load(timeout=5.0) is False
+
+
+def test_wait_for_element_keeps_polling_when_context_destroyed():
+    calls = 0
+
+    def fake_js(expr, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise RuntimeError("Execution context was destroyed.")
+        return True
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js), \
+         patch("browser_harness.helpers.time") as mock_time:
+        start = 1000.0
+        mock_time.time.side_effect = [start, start + 0.1, start + 0.4]
+        mock_time.sleep = lambda _: None
+        assert helpers.wait_for_element("#target", timeout=5.0) is True
+    assert calls == 2
+
+
+def test_wait_for_element_returns_false_when_js_fails_until_timeout():
+    def fake_js(expr, **kwargs):
+        raise RuntimeError("Cannot find default execution context")
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js), \
+         patch("browser_harness.helpers.time") as mock_time:
+        start = 1000.0
+        mock_time.time.side_effect = [start, start + 0.1, start + 20.0]
+        mock_time.sleep = lambda _: None
+        assert helpers.wait_for_element("#missing", timeout=5.0) is False
+
+
+def test_wait_for_element_reraises_permanent_js_error():
+    # A deterministic probe failure (e.g. malformed CSS selector) throws the
+    # same JS exception on every poll — swallowing it would burn the full
+    # timeout and return False, indistinguishable from "element absent".
+    def fake_js(expr, **kwargs):
+        raise RuntimeError(
+            "JavaScript evaluation failed: 'div[' is not a valid selector"
+        )
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js):
+        with pytest.raises(RuntimeError, match="not a valid selector"):
+            helpers.wait_for_element("div[", timeout=5.0)
+
+
+def test_wait_for_load_reraises_daemon_fatal_error():
+    # Daemon-relayed fatal errors (dead Chrome websocket, no attached tab)
+    # are not "not ready yet" — they must surface on the first probe instead
+    # of masquerading as a slow page for the full timeout.
+    def fake_js(expr, **kwargs):
+        raise RuntimeError("cdp_disconnected")
+
+    with patch("browser_harness.helpers.js", side_effect=fake_js):
+        with pytest.raises(RuntimeError, match="cdp_disconnected"):
+            helpers.wait_for_load(timeout=5.0)
+
+
 # --- wait_for_network_idle ---
 
 def test_wait_for_network_idle_returns_true_when_no_events():
