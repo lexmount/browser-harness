@@ -16,7 +16,7 @@ run on Lexmount cloud browsers via browser-harness. Each site is measured on two
 | total tokens · case A | 56.1M | 20.3M | −64% |
 | total tokens · case B | 48.5M | 21.2M | −56% |
 
-**Generalization retention ≈ 123%** — the skill's benefit on the unseen task is at least
+**Overall (case A + B pooled, 72 valid pairs): control 69.4% -> skill 84.0% (+14.6pp). Generalization retention ≈ 123%** — the skill's benefit on the unseen task is at least
 as large as on the tuned task, i.e. skills encode transferable site knowledge (endpoints,
 selectors, anti-bot workarounds), not memorized answers.
 
