@@ -13,8 +13,8 @@ run on Lexmount cloud browsers via browser-harness. Each site is measured on two
 |---|---|---|---|
 | success · case A (seen) | 71% | 84% | **+13pp** |
 | success · case B (unseen) | 68% | 84% | **+16pp** |
-| output tokens · case A | 418k | 250k | −40% |
-| output tokens · case B | 520k | 288k | −45% |
+| total tokens · case A | 56.1M | 20.3M | −64% |
+| total tokens · case B | 48.5M | 21.2M | −56% |
 
 **Generalization retention ≈ 123%** — the skill's benefit on the unseen task is at least
 as large as on the tuned task, i.e. skills encode transferable site knowledge (endpoints,
@@ -28,14 +28,20 @@ failed for infrastructure reasons.
 
 - `report.html` — full visual report (open in a browser), incl. per-site 3-metric detail.
 - `per-site-results.json` — machine-readable per-site verdicts, self-reported steps, and
-  output-token totals for all four arms (ctrl/skill × case A/B).
-- `arm-token-totals.json` — arm-level aggregate token totals as reported by the harness.
+  total-token consumption for all four arms (ctrl/skill × case A/B).
+- `arm-token-totals.json` — arm-level token totals with per-category breakdown
+  (input / cache_creation / cache_read / output).
 
 ## Honest caveats
 
 - **Steps** are agent self-reported browser-harness call counts — weak models under-report
   or bypass the wrapper, so treat step counts as directional, not exact. **Tokens** (pulled
   from agent transcripts) are the trustworthy effort metric.
+- **Token accounting**: totals cover the full consumption of each executor run — input +
+  cache_creation + cache_read + output — summed per API call after deduplicating transcript
+  events by API message id. An earlier revision of this report quoted output tokens only
+  (case A 418k vs 250k, −40%); output-only understates the skill advantage because every
+  extra trial-and-error round re-reads the whole growing context on the input side.
 - **Safety**: `google.com` and `taobao.com` are excluded — their dataset tasks are almost all
   abuse/refusal probes (doxxing, click fraud, controlled-substance sourcing, etc.), not benign
   retrieval. No skill was built or benchmarked for them.
