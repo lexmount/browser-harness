@@ -169,8 +169,6 @@ def test_fill_input_raises_when_element_not_found():
 
 
 def test_fill_input_clear_first_sends_select_all_then_backspace():
-    import sys
-
     key_events = []
 
     def fake_cdp(method, **kwargs):
@@ -185,14 +183,19 @@ def test_fill_input_clear_first_sends_select_all_then_backspace():
          patch("browser_harness.helpers.js", side_effect=fake_js):
         helpers.fill_input("#inp", "x", clear_first=True)
 
-    # The "a" must be dispatched with the platform-correct modifier (Meta=4 on
-    # macOS, Ctrl=2 elsewhere). Without the modifier, the field would never get
-    # selected — it would just receive a literal "a".
-    expected_mod = 4 if sys.platform == "darwin" else 2
-    a_events = [e for e in key_events if e.get("key") == "a"]
-    assert a_events, "expected an 'a' key event for select-all"
-    assert all(e.get("modifiers") == expected_mod for e in a_events), \
-        f"select-all 'a' must carry modifiers={expected_mod}; got {[e.get('modifiers') for e in a_events]}"
+    # Select-all must use CDP's editing command, which the renderer executes
+    # regardless of its OS. A modifier chord (Cmd=4 / Ctrl=2) picked from the
+    # *client* OS breaks when the browser runs elsewhere (e.g. macOS client
+    # driving a Linux cloud browser: Meta+A is a no-op there, so Backspace
+    # deletes one char and the text gets appended instead of replaced).
+    select_all_downs = [
+        e for e in key_events
+        if e.get("type") == "rawKeyDown" and e.get("commands") == ["selectAll"]
+    ]
+    assert select_all_downs, \
+        "expected a rawKeyDown carrying commands=['selectAll'] for select-all"
+    assert all(not e.get("modifiers") for e in key_events if e.get("key") == "a"), \
+        "select-all must not carry OS-guessed modifiers (renderer OS may differ from client OS)"
 
     # Crucial: no `char` event for the "a" — emitting one makes Chrome treat
     # Cmd/Ctrl+A as a printable letter instead of a shortcut.
